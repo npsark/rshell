@@ -9,35 +9,40 @@
 #include <sys/wait.h>
 using namespace std;
 
+char** tokenize(string input, const char *delim);
+int parseForArgs(string input);
+void parseForLogic(string input);
+void parseForCommands(string input);
 void runCommand(char **argv);
 
 int main(){
-	vector<char*> argvVect;
 
-/*
-	char **argv = new char*[2];
-	argv[0] = new char[3];
-		strcpy(argv[0], "ls");
-	argv[1] = new char[3];
-		strcpy(argv[1], "-l");
+
+	/*string a = "hey my name && is nate dawg.;sometimes i use ampersands && and sometimes i dont.";
+	char **toks = tokenize(a, ";");
+	uint i=0;
+	while(toks[i]){
+		cout << "i: " << i << " " << toks[i] << endl;
+
+		char **subtoks = tokenize( toks[i], "&");
+		uint k=0;
+		while(subtoks[k]){
+			cout << "\tk: " << subtoks[k] << endl;
+			
+			char **subsubtoks = tokenize( subtoks[k], " ");
+			uint j=0;
+			while(subsubtoks[j]){
+				cout << "\t\tj: " << subsubtoks[j] << endl;
+				j++;
+			}
+			k++;
+		}	
+		i++;
+	}
+		
+	return 0;*/
 	
-	
-	runCommand(argv);
 
-	delete argv[0];
-	delete argv[1];
-	delete argv;
-
-	argv = new char*[1];
-
-	argv[0] = new char[6];
-		strcpy(argv[0], "clear");
-	
-	runCommand(argv);
-*/
-
-	char **argv;
-	
 	string input;
 	do{
 		//display prompt
@@ -45,8 +50,7 @@ int main(){
 
 		//get user input and store as string and cstring
 		getline(cin, input);
-		char *input_cstr = new char[input.length()+1];
-		strcpy(input_cstr, input.c_str());
+		
 
 
 		//if user inputs "exit" quit the shell
@@ -54,50 +58,9 @@ int main(){
 			exit(1);
 		}	
 
+		parseForCommands(input);
 
-
-		//this will count how many tokens there are
-		uint count = 0;
-
-		//clear the argv Vector
-		argvVect.clear();
-	
-		//get first token
-		char *token = strtok(input_cstr, " ");
 		
-		//push the first token to the vector
-		argvVect.push_back(token);
-		
-		//this loop collects the rest of the tokens and counts them
-		while(token != NULL){
-			count++;
-			token = strtok(NULL, " ");
-			argvVect.push_back(token);
-		}
-
-		//initialize the arcv array
-		argv = new char*[count+1];
-		argv[count] = 0;
-		//copy the contents of the vector to the argv array
-		for(uint i=0; i<count; i++){
-			int len = strlen(argvVect[i])+1;
-
-			argv[i] = new char[len];
-			argv[i][len-1] = 0;		
-	
-			strcpy(argv[i], argvVect[i]);
-			cout << "argv[" << i << "] = " << argv[i] << endl << endl;
-		}
-
-		//run the command the user has requested
-		runCommand(argv);
-
-		//clear the argv array
-		for(uint i=0; i<count; i++){
-			delete argv[i];
-		}
-		//delete argv;		
-
 
 	}while(input != "exit");
 	
@@ -105,27 +68,161 @@ int main(){
 
 }
 
+char** tokenize(string input, const char *delim){
+	
+	char *input_cstr = new char[input.length()+1];
+		strcpy(input_cstr, input.c_str());
+
+	vector<char*> argvVect;	
+	argvVect.clear();
+
+	char *token = strtok(input_cstr, delim);
+	
+	
+
+	while(token != NULL){
+		argvVect.push_back(token);
+		token = strtok(NULL, delim);
+	}
+
+	uint tokCount = argvVect.size();
+	char **tokArr = new char*[tokCount+1];
+	tokArr[tokCount] = 0;
+
+	
+
+	for(uint i=0; i<tokCount; i++){
+
+		int len = strlen(argvVect[i]) + 1;
+		tokArr[i] = new char[len];
+		strcpy(tokArr[i], argvVect[i]);
+
+	}
+	
+	return tokArr;
+
+
+}
+
+
+int parseForArgs(string input){
+	
+	
+	//get tokens from input in char* array
+	char **toks = tokenize(input, " ");
+
+	
+	string which = "[ -e /bin/";
+	which += string(toks[0]) + " ] || [ -e /usr/bin/" + string(toks[0]) + " ] || [ -e " + string(toks[0]) + " ]";
+
+	bool success = !(  system(  which.c_str()) == 256 );
+
+	//run the command
+	if(success){
+		runCommand(toks);
+	}else{
+		cout << "command not found." << endl;
+		return 1;
+	}
+	//clear the toks array
+	uint i=0;
+	while(toks[i]){
+		delete toks[i];
+		i++;
+	}
+
+	//delete toks
+	delete toks;
+
+	return 0;
+
+}
+
+
+void parseForLogic(string input){
+
+	uint i=0;
+
+	char **toks = tokenize(input, "&|");
+	i=0;
+
+	bool andStatement = (input.find("&&") != string::npos);
+	bool orStatement = (input.find("||") != string::npos);
+
+	while(toks[i]){
+		//parse each bit between | and &
+		int success = parseForArgs(toks[i]);
+
+
+		if( andStatement ){
+			if(success == 1){
+				return;
+			}
+		}else if( orStatement ){
+			if(success == 0){
+				return;
+			}
+		}
+
+		i++;
+	}
+
+	
+
+
+	i=0;
+	while(toks[i]){
+		//parse each bit between semicolons
+		delete toks[i];	
+		i++;
+	}
+	delete toks;
+
+}
+
+//split up input by semicolons
+void parseForCommands(string input){
+
+	char **toks = tokenize(input, ";");
+	uint i=0;
+	while(toks[i]){
+		//parse each bit between semicolons
+		parseForLogic(toks[i]);	
+		i++;
+	}
+	
+	i=0;
+	while(toks[i]){
+		//parse each bit between semicolons
+		delete toks[i];	
+		i++;
+	}
+	delete toks;
+	
+}
+
 void runCommand(char **argv){
+
 	int pid = fork();
 	if(pid == -1){
 
 		perror("fork() had an error.\n");
 		exit(1);
 
-	}else if(pid == 0){
+	}else if(pid == 0){//child
 
-		//cout << "This is the child process.\n";
 		if(execvp(argv[0], argv) == -1){
 			perror("execvp() had an error.\n");
 		}
+		
 		exit(1);
 
-	}else if(pid > 0){
+	}else if(pid > 0){//parent
 
 		if(wait(0) == -1){
 			perror("wait() had an error.\n");
 		}
-		//cout << "This is the parent process.\n";
+ 
 	}
 
 
