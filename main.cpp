@@ -17,32 +17,6 @@ void runCommand(char **argv);
 
 int main(){
 
-
-	/*string a = "hey my name && is nate dawg.;sometimes i use ampersands && and sometimes i dont.";
-	char **toks = tokenize(a, ";");
-	uint i=0;
-	while(toks[i]){
-		cout << "i: " << i << " " << toks[i] << endl;
-
-		char **subtoks = tokenize( toks[i], "&");
-		uint k=0;
-		while(subtoks[k]){
-			cout << "\tk: " << subtoks[k] << endl;
-			
-			char **subsubtoks = tokenize( subtoks[k], " ");
-			uint j=0;
-			while(subsubtoks[j]){
-				cout << "\t\tj: " << subsubtoks[j] << endl;
-				j++;
-			}
-			k++;
-		}	
-		i++;
-	}
-		
-	return 0;*/
-	
-
 	string input;
 	do{
 		//display prompt
