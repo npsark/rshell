@@ -7,13 +7,16 @@
 #include <stdlib.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <signal.h>
 using namespace std;
+
+
 
 char** tokenize(string input, const char *delim);
 int parseForArgs(string input);
 void parseForLogic(string input);
 void parseForCommands(string input);
-void runCommand(char **argv);
+int runCommand(char **argv);
 
 int main(){
 
@@ -87,19 +90,8 @@ int parseForArgs(string input){
 	//get tokens from input in char* array
 	char **toks = tokenize(input, " ");
 
-	
-	string which = "[ -e /bin/";
-	which += string(toks[0]) + " ] || [ -e /usr/bin/" + string(toks[0]) + " ] || [ -e " + string(toks[0]) + " ]";
+	int prg = runCommand(toks);	
 
-	bool success = !(  system(  which.c_str()) == 256 );
-
-	//run the command
-	if(success){
-		runCommand(toks);
-	}else{
-		cout << "command not found." << endl;
-		return 1;
-	}
 	//clear the toks array
 	uint i=0;
 	while(toks[i]){
@@ -110,7 +102,10 @@ int parseForArgs(string input){
 	//delete toks
 	delete toks;
 
-	return 0;
+	
+	
+
+	return prg;
 
 }
 
@@ -122,29 +117,29 @@ void parseForLogic(string input){
 	char **toks = tokenize(input, "&|");
 	i=0;
 
-	bool andStatement = (input.find("&&") != string::npos);
+	//bool andStatement = (input.find("&&") != string::npos);
 	bool orStatement = (input.find("||") != string::npos);
+
 
 	while(toks[i]){
 		//parse each bit between | and &
 		int success = parseForArgs(toks[i]);
 
-
-		if( andStatement ){
-			if(success == 1){
+		
+	
+		if( orStatement ){
+			if(success == 0){
 				return;
 			}
-		}else if( orStatement ){
-			if(success == 0){
+		}else if( !orStatement){
+			if(success != 0){
 				return;
 			}
 		}
 
 		i++;
 	}
-
 	
-
 
 	i=0;
 	while(toks[i]){
@@ -177,7 +172,10 @@ void parseForCommands(string input){
 	
 }
 
-void runCommand(char **argv){
+
+int runCommand(char **argv){
+
+	int status = 0;
 
 	int pid = fork();
 	if(pid == -1){
@@ -194,13 +192,14 @@ void runCommand(char **argv){
 		exit(1);
 
 	}else if(pid > 0){//parent
-
-		if(wait(0) == -1){
+		
+		if(wait(&status) == -1){
 			perror("wait() had an error.\n");
 		}
- 
-	}
 
+	}
+	
+	return status;
 
 }
 
