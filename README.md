@@ -3,6 +3,8 @@
 ##Purpose
 The goal of this project is to develop a simple shell into which the user can input commands.
 
+##Function
+
 At this point, rshell is capable of:
 * executing most Unix commands.
 * stringing commands together with the logical operators AND(&&) and OR(||).
@@ -12,30 +14,30 @@ The hierarchy of the logical operators and semicolons is such that, the input is
 
 For example, the command
 
-`echo hello && echo how are you; echo test || echo echo isn't working`
+`echo A && echo B; echo C || echo D`
 
 is first parsed into the two compound commands
 
-`echo hello && echo how are you`
+`echo A && echo B`
 
 and
 
-`echo test || echo echo isn't working`
+`echo C || echo D`
 
 Next, each of the compound commands are parsed with respect to their corresponding logical operators
 
-`echo hello` AND `echo how are you`
+`echo A` AND `echo B`
 
 and
 
-`echo test` OR `echo echo isn't working`
+`echo C` OR `echo D`
 
 The final output would be
 
 ```
-hello
-how are you
-test
+A
+B
+C
 ```
 
 ##Building
