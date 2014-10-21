@@ -45,7 +45,7 @@ C
 
 At this point, *rshell* checks to see if there is an OR operator(||) in the input. If there is, it processes the command such that, it stops executing once it succesfully executes one of the comands separated by the OR operator. If there is no OR operator, it processes the input such that, it only executes the next command is the last one was successful.
 
-Of course, this is only relevent for compund commands. Single commands simply execute and succeed or fail.
+Of course, this is only relevent for compound commands. Single commands simply execute and succeed or fail.
 
 ##Building
 
