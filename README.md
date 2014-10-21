@@ -9,6 +9,8 @@ At this point, rshell is capable of:
 * executing most Unix commands.
 * stringing commands together with the logical operators AND(&&) and OR(||).
 * executing multiple commands separated by semicolons.
+* processing comments after the pound sign(#).
+* exiting when `exit` is entered at the prompt.
 
 The hierarchy of the logical operators and semicolons is such that, the input is first separated by semicolons and then the resulting compound or simple commands are separated by && and ||.
 
