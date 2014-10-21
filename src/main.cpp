@@ -20,10 +20,15 @@ int runCommand(char **argv);
 
 int main(){
 
+	char *hostname = new char[50];
+		gethostname(hostname, 50);
+	char *login = getlogin();
+	
+
 	string input;
 	do{
 		//display prompt
-		cout << "$ ";
+		cout << login << "@" << hostname <<"$ ";
 
 		//get user input and store as string and cstring
 		getline(cin, input);
