@@ -1,4 +1,4 @@
-#RSHELL
+RSHELL
 
 ##Purpose
 The goal of this project is to develop a simple shell into which the user can input commands.
