@@ -49,7 +49,7 @@ Of course, this is only relevent for compound commands. Single commands simply e
 
 ##Building
 
-To build *rshell*, first clone the repository to your local machine. Next, navigate to the folder that `Makefile` is in. Run the command make. This will create a bin folder in which the executable rshell will be located.
+To build *rshell*, first clone the repository to your local machine. Next, navigate to the folder that `Makefile` is in. Run the command `make`. This will create a `bin` folder in which the executable *rshell* will be located.
 
 
 ##Bugs
