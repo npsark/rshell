@@ -1,103 +1,144 @@
-Script started on Mon 20 Oct 2014 06:13:58 PM PDT
+Script started on Tue 21 Oct 2014 07:06:11 PM PDT
 ]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ bin/rshell 
-$ #this is a test to show that rshell cannot handle quotation marks yet
-$ echo "hello world"
+nat@Nat-Debian$ #testing only comment entered^[[D     d
+nat@Nat-Debian$ #testing nothing ene tered
+nat@Nat-Debian$ 
+nat@Nat-Debian$ #testing          ls #test ting command with comment
+bin  exec.script  LICENSE  Makefile  README.md	src  tests
+nat@Nat-Debian$ ls -a#  tr esting command with p a paramerter    ter and comment with no space bete ween the paramt eter and comment
+.  ..  bin  exec.script  .git  LICENSE	Makefile  README.md  src  tests
+nat@Nat-Debian$ #same with t            ls -a -l  #same with two params
+total 52
+drwxr-xr-x 6 nat nat  4096 Oct 21 19:06 .
+drwxr-xr-x 3 nat nat  4096 Oct 20 22:56 ..
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:05 bin
+-rw-r--r-- 1 nat nat     0 Oct 21 19:06 exec.script
+drwxr-xr-x 8 nat nat  4096 Oct 20 23:32 .git
+-rw-r--r-- 1 nat nat 18027 Oct 20 17:39 LICENSE
+-rw-r--r-- 1 nat nat   213 Oct 20 17:35 Makefile
+-rw-r--r-- 1 nat nat  2445 Oct 20 23:31 README.md
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:00 src
+drwxr-xr-x 2 nat nat  4096 Oct 21 18:58 tests
+nat@Nat-Debian$ ^[  ls -a -l; echo hello#testing two commands with semicolon in between and comment at end
+total 52
+drwxr-xr-x 6 nat nat  4096 Oct 21 19:06 .
+drwxr-xr-x 3 nat nat  4096 Oct 20 22:56 ..
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:05 bin
+-rw-r--r-- 1 nat nat     0 Oct 21 19:06 exec.script
+drwxr-xr-x 8 nat nat  4096 Oct 20 23:32 .git
+-rw-r--r-- 1 nat nat 18027 Oct 20 17:39 LICENSE
+-rw-r--r-- 1 nat nat   213 Oct 20 17:35 Makefile
+-rw-r--r-- 1 nat nat  2445 Oct 20 23:31 README.md
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:00 src
+drwxr-xr-x 2 nat nat  4096 Oct 21 18:58 tests
+hello
+nat@Nat-Debian$ rshell      bin/s rshell: #testing rshell in rshell
+nat@Nat-Debian$ echo hello#this is executed byt  the re shell in the first rshell
+hello
+nat@Nat-Debian$ exit#exit the inner rshell
+nat@Nat-Debian$ echo "hello world"#testing echo with quotes
 "hello world"
-$ echo "hello
-"hello
-$ eh cho world"
-world"
-$ echo hellow    world
+nat@Nat-Debian$ echo hello world#  testing echo withoug t quotes
 hello world
-$ 
-$ 
-$
-$ #this is a test to show that rshell cannot process commands in which the parameters are not all separated by spaces. unless they are combined into a single parameter.
-$ top i-  -i -c
-[?1h=[H[2J[?25l(B[mtop - 18:14:45 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-Tasks:(B[m[39;49m[1m 124 (B[m[39;49mtotal,(B[m[39;49m[1m   1 (B[m[39;49mrunning,(B[m[39;49m[1m 123 (B[m[39;49msleeping,(B[m[39;49m[1m   0 (B[m[39;49mstopped,(B[m[39;49m[1m   0 (B[m[39;49mzombie(B[m[39;49m(B[m[39;49m[K
-%Cpu(s):(B[m[39;49m[1m  8.5 (B[m[39;49mus,(B[m[39;49m[1m  2.2 (B[m[39;49msy,(B[m[39;49m[1m  0.0 (B[m[39;49mni,(B[m[39;49m[1m 88.3 (B[m[39;49mid,(B[m[39;49m[1m  0.9 (B[m[39;49mwa,(B[m[39;49m[1m  0.0 (B[m[39;49mhi,(B[m[39;49m[1m  0.2 (B[m[39;49msi,(B[m[39;49m[1m  0.0 (B[m[39;49mst(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   720164 (B[m[39;49mused,(B[m[39;49m[1m   306848 (B[m[39;49mfree,(B[m[39;49m[1m    28248 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250760 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-[7m  PID USER      PR  NI  VIRT  RES  SHR S  %CPU %MEM    TIME+  COMMAND           (B[m[39;49m
-(B[m[1m 7776 nat       20   0 23168 1508 1112 R   6.2  0.1   0:00.01 top -i -c         (B[m[39;49m
-[J[6;1H[K[?12l[?25h[25;1H[?12l[?25h
-$ op  top -ic
-[?1h=[H[2J[?25l(B[mtop - 18:14:50 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-Tasks:(B[m[39;49m[1m 124 (B[m[39;49mtotal,(B[m[39;49m[1m   1 (B[m[39;49mrunning,(B[m[39;49m[1m 123 (B[m[39;49msleeping,(B[m[39;49m[1m   0 (B[m[39;49mstopped,(B[m[39;49m[1m   0 (B[m[39;49mzombie(B[m[39;49m(B[m[39;49m[K
-%Cpu(s):(B[m[39;49m[1m  8.5 (B[m[39;49mus,(B[m[39;49m[1m  2.2 (B[m[39;49msy,(B[m[39;49m[1m  0.0 (B[m[39;49mni,(B[m[39;49m[1m 88.3 (B[m[39;49mid,(B[m[39;49m[1m  0.9 (B[m[39;49mwa,(B[m[39;49m[1m  0.0 (B[m[39;49mhi,(B[m[39;49m[1m  0.2 (B[m[39;49msi,(B[m[39;49m[1m  0.0 (B[m[39;49mst(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   719908 (B[m[39;49mused,(B[m[39;49m[1m   307104 (B[m[39;49mfree,(B[m[39;49m[1m    28256 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250752 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-[7m  PID USER      PR  NI  VIRT  RES  SHR S  %CPU %MEM    TIME+  COMMAND           (B[m[39;49m
-[J[6;1H[K[?12l[?25h[H[?25l(B[mtop - 18:14:51 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   719908 (B[m[39;49mused,(B[m[39;49m[1m   307104 (B[m[39;49mfree,(B[m[39;49m[1m    28256 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250752 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-[7m  PID USER      PR  NI  VIRT  RES  SHR S  %CPU %MEM    TIME+  COMMAND           (B[m[39;49m
-(B[m[1m 3684 nat       20   0  309m  13m 6460 R   1.4  1.3   0:43.23 gnome-terminal    (B[m[39;49m
-(B[m[1m 7777 nat       20   0 23172 1580 1148 R   1.4  0.2   0:00.02 top -ic           (B[m[39;49m
-[J[4;1H[K[?12l[?25h[4;1H[7m Unknown command - try 'h' for help (B[m[39;49m[K[H[?25l(B[mtop - 18:14:52 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-
-
-
-
-(B[m 7533 root      20   0     0    0    0 S   0.7  0.0   0:00.29 [kworker/0:1]     (B[m[39;49m
-[J[4;1H[K[?12l[?25h[4;1H[7m Unknown command - try 'h' for help (B[m[39;49m[K[H[?25l(B[mtop - 18:14:53 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   719916 (B[m[39;49mused,(B[m[39;49m[1m   307096 (B[m[39;49mfree,(B[m[39;49m[1m    28256 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250768 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-
-(B[m 3223 nat       20   0 78916  956  808 S   0.8  0.1   0:04.01 /usr/lib/gvfs/gvf (B[m[39;49m
-(B[m 7090 root      20   0     0    0    0 S   0.8  0.0   0:00.97 [kworker/0:2]     (B[m[39;49m
-[J[4;1H[K[?12l[?25h[H[?25l
-
-
-
-
-[J[4;1H[K[?12l[?25h[25;1H[?12l[?25h
-$ top  -i-c
+nat@Nat-Debian$ mkdir ne  testdir#testing directory creato ion
+nat@Nat-Debian$ ls#see if the directory was created^[[D     d
+bin  exec.script  LICENSE  Makefile  README.md	src  testdir  tests
+nat@Nat-Debian$ touch testdir/newfie le #testing new file creation within our new directory
+nat@Nat-Debian$ ls testdir
+newfile
+nat@Nat-Debian$ rm    touch testdir second       /secondfile
+nat@Nat-Debian$ ls testdir
+newfile  secondfile
+nat@Nat-Debian$ rm test/dir    dir/secondfile#testing remova      file deletion
+nat@Nat-Debian$ ls testdir
+newfile
+nat@Nat-Debian$ rm testdir -r/3  #testing recursive directory dee letion
+nat@Nat-Debian$ ls
+bin  exec.script  LICENSE  Makefile  README.md	src  tests
+nat@Nat-Debian$ bash ##testing running bash in rshell
+]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ ls
+[0m[01;34mbin[0m  exec.script  LICENSE  Makefile  README.md  [01;34msrc[0m  [01;34mtests[0m
+]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ exit
+exit
+nat@Nat-Debian$ #back in rshell fr  ad fter exiting   ting bash
+nat@Nat-Debian$ vim newfile #run   testing running vim in rshell
+[?1049h[?1h=[1;24r[?12;25h[?12l[?25h[27m[m[H[2J[?25l[24;1H"newfile" [New File][>c[2;1H[1m[34m~                                                                               [3;1H~                                                                               [4;1H~                                                                               [5;1H~                                                                               [6;1H~                                                                               [7;1H~                                                                               [8;1H~                                                                               [9;1H~                                                                               [10;1H~                                                                               [11;1H~                                                                               [12;1H~                                                                               [13;1H~                                                                               [14;1H~                                                                               [15;1H~                                                                               [16;1H~                                                                               [17;1H~                                                                               [18;1H~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [m[24;63H0,0-1[9CAll[1;1H[?12l[?25hP+q436f\P+q6b75\P+q6b64\P+q6b72\P+q6b6c\P+q2332\P+q2334\P+q2569\P+q2a37\P+q6b31\[?25l[24;1H[1m-- INSERT --[m[24;13H[K[24;63H0,1[11CAll[1;1H[?12l[?25h[?25lH[24;63H1,2[1;2H[?12l[?25h[?25lHe[24;65H3[1;3H[?12l[?25h[?25lel[24;65H4[1;4H[?12l[?25h[?25lll[24;65H5[1;5H[?12l[?25h[?25llo[24;65H6[1;6H[?12l[?25h[?25l[24;65H7[1;7H[?12l[?25h[?25l I[24;65H8[1;8H[?12l[?25h[?25l[24;65H9[1;9H[?12l[?25h[?25l c[24;65H10[1;10H[?12l[?25h[?25lcr[24;66H1[1;11H[?12l[?25h[?25lre[24;66H2[1;12H[?12l[?25h[?25lea[24;66H3[1;13H[?12l[?25h[?25lat[24;66H4[1;14H[?12l[?25h[?25lte[24;66H5[1;15H[?12l[?25h[?25led[24;66H6[1;16H[?12l[?25h[?25l[24;66H7[1;17H[?12l[?25h[?25l a[24;66H8[1;18H[?12l[?25h[?25lan[24;66H9[1;19H[?12l[?25h[?25lnd[24;65H20[1;20H[?12l[?25h[?25l[24;66H1[1;21H[?12l[?25h[?25l e[24;66H2[1;22H[?12l[?25h[?25led[24;66H3[1;23H[?12l[?25h[?25ldi[24;66H4[1;24H[?12l[?25h[?25lit[24;66H5[1;25H[?12l[?25h[?25lte[24;66H6[1;26H[?12l[?25h[?25led[24;66H7[1;27H[?12l[?25h[?25l[24;66H8[1;28H[?12l[?25h[?25l t[24;66H9[1;29H[?12l[?25h[?25lth[24;65H30[1;30H[?12l[?25h[?25lhi[24;66H1[1;31H[?12l[?25h[?25lis[24;66H2[1;32H[?12l[?25h[?25l[24;66H3[1;33H[?12l[?25h[?25l f[24;66H4[1;34H[?12l[?25h[?25lfi[24;66H5[1;35H[?12l[?25h[?25lil[24;66H6[1;36H[?12l[?25h[?25lle[24;66H7[1;37H[?12l[?25h[?25l[24;66H8[1;38H[?12l[?25h[?25l i[24;66H9[1;39H[?12l[?25h[?25lin[24;65H40[1;40H[?12l[?25h[?25l[24;66H1[1;41H[?12l[?25h[?25l v[24;66H2[1;42H[?12l[?25h[?25lvi[24;66H3[1;43H[?12l[?25h[?25lim[24;66H4[1;44H[?12l[?25h[?25l[24;66H5[1;45H[?12l[?25h[?25l w[24;66H6[1;46H[?12l[?25h[?25lwh[24;66H7[1;47H[?12l[?25h[?25lhi[24;66H8[1;48H[?12l[?25h[?25lil[24;66H9[1;49H[?12l[?25h[?25lle[24;65H50[1;50H[?12l[?25h[?25l[24;66H1[1;51H[?12l[?25h[?25l r[24;66H2[1;52H[?12l[?25h[?25lru[24;66H3[1;53H[?12l[?25h[?25lun[24;66H4[1;54H[?12l[?25h[?25lnn[24;66H5[1;55H[?12l[?25h[?25lni[24;66H6[1;56H[?12l[?25h[?25lin[24;66H7[1;57H[?12l[?25h[?25lng[24;66H8[1;58H[?12l[?25h[?25l[24;66H9[1;59H[?12l[?25h[?25l i[24;65H60[1;60H[?12l[?25h[?25lin[24;66H1[1;61H[?12l[?25h[?25l[1;60H[K[24;66H0[1;60H[?12l[?25h[?25l[1;59H[K[24;65H59[1;59H[?12l[?25h[?25l[24;66H8[1;58H[?12l[?25h[?25l[1;57H[K[24;66H7[1;57H[?12l[?25h[?25l[1;56H[K[24;66H6[1;56H[?12l[?25h[?25l[1;55H[K[24;66H5[1;55H[?12l[?25h[?25l[1;54H[K[24;66H4[1;54H[?12l[?25h[?25l[1;53H[K[24;66H3[1;53H[?12l[?25h[?25l[1;52H[K[24;66H2[1;52H[?12l[?25h[?25l[1;51H[K[24;66H1[1;51H[?12l[?25h[?25l[24;66H0[1;50H[?12l[?25h[?25l[1;49H[K[24;65H49[1;49H[?12l[?25h[?25l[1;48H[K[24;66H8[1;48H[?12l[?25h[?25l[1;47H[K[24;66H7[1;47H[?12l[?25h[?25l[1;46H[K[24;66H6[1;46H[?12l[?25h[?25l[1;45H[K[24;66H5[1;45H[?12l[?25h[?25l r[24;66H6[1;46H[?12l[?25h[?25lru[24;66H7[1;47H[?12l[?25h[?25lun[24;66H8[1;48H[?12l[?25h[?25lnn[24;66H9[1;49H[?12l[?25h[?25lni[24;65H50[1;50H[?12l[?25h[?25lin[24;66H1[1;51H[?12l[?25h[?25lng[24;66H2[1;52H[?12l[?25h[?25l[24;66H3[1;53H[?12l[?25h[?25l i[24;66H4[1;54H[?12l[?25h[?25lin[24;66H5[1;55H[?12l[?25h[?25l[24;66H6[1;56H[?12l[?25h[?25l r[24;66H7[1;57H[?12l[?25h[?25lrs[24;66H8[1;58H[?12l[?25h[?25lsh[24;66H9[1;59H[?12l[?25h[?25lhe[24;65H60[1;60H[?12l[?25h[?25lel[24;66H1[1;61H[?12l[?25h[?25lll[24;66H2[1;62H[?12l[?25h[?25ll![24;66H3[1;63H[?12l[?25h[24;1H[K[1;62H[?25l[24;63H1,62[10CAll[1;62H[?12l[?25h[?25l[24;63H[K[24;1H:[?12l[?25hw[?25l[?12l[?25hq[?25l[?12l[?25h[?25l"newfile" [New] 1L, 63C written
+[?1l>[?12l[?25h[?1049lnat@Nat-Debian$ cat newfile #testing cat
+Hello I created and edited this file in vim running in rshell!
+nat@Nat-Debian$ ls              		-a#testing extra spaces and tabs in command
+ls: cannot access 		-a: No such file or directory
+nat@Nat-Debian$ # ls -                       -a# testing only spa   extra spaced, no tabs
+.   bin		 .git	  Makefile  README.md  tests
+..  exec.script  LICENSE  newfile   src
+nat@Nat-Debian$ ls -al    #testing no  combined parameters
+total 64
+drwxr-xr-x 6 nat nat  4096 Oct 21 19:13 .
+drwxr-xr-x 3 nat nat  4096 Oct 20 22:56 ..
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:05 bin
+-rw-r--r-- 1 nat nat  8192 Oct 21 19:13 exec.script
+drwxr-xr-x 8 nat nat  4096 Oct 20 23:32 .git
+-rw-r--r-- 1 nat nat 18027 Oct 20 17:39 LICENSE
+-rw-r--r-- 1 nat nat   213 Oct 20 17:35 Makefile
+-rw-r--r-- 1 nat nat    63 Oct 21 19:13 newfile
+-rw-r--r-- 1 nat nat  2445 Oct 20 23:31 README.md
+drwxr-xr-x 2 nat nat  4096 Oct 21 19:00 src
+drwxr-xr-x 2 nat nat  4096 Oct 21 18:58 tests
+nat@Nat-Debian$ ssh -Y nsark002@hammer.cs.ucr.edu#testing ssh into school server
+nsark002@hammer.cs.ucr.edu's password: 
+Last login: Mon Oct 20 23:18:54 2014 from 169.235.92.99
+~
+nsark002@hammer $ I am [K[K[K[K[K#currently in [K[K[Kssh'ed in [Kto th[K[Khammer.cs.ucr.edu from within rshell
+~
+nsark002@hammer $ exit
+logout
+[H[2JConnection to hammer.cs.ucr.edu closed.
+nat@Nat-Debian$ ls
+bin  exec.script  LICENSE  Makefile  newfile  README.md  src  tests
+nat@Nat-Debian$ #back in rshell on local machine
+nat@Nat-Debian$ bin/rshell;bin/rshell;bin/rshell;bin/rshell#testing numerous rshells within eachother
+nat@Nat-Debian$ exit
+nat@Nat-Debian$ exit
+nat@Nat-Debian$ exit
+nat@Nat-Debian$ exit
+nat@Nat-Debian$ #bac to    k to original rshell                    ck to original rshell
+nat@Nat-Debian$ vim test.cpp
+[?1049h[?1h=[1;24r[?12;25h[?12l[?25h[27m[m[H[2J[?25l[24;1H"test.cpp" [New File][>c[2;1H[1m[34m~                                                                               [3;1H~                                                                               [4;1H~                                                                               [5;1H~                                                                               [6;1H~                                                                               [7;1H~                                                                               [8;1H~                                                                               [9;1H~                                                                               [10;1H~                                                                               [11;1H~                                                                               [12;1H~                                                                               [13;1H~                                                                               [14;1H~                                                                               [15;1H~                                                                               [16;1H~                                                                               [17;1H~                                                                               [18;1H~                                                                               [19;1H~                                                                               [20;1H~                                                                               [21;1H~                                                                               [22;1H~                                                                               [23;1H~                                                                               [m[24;63H0,0-1[9CAll[1;1H[?12l[?25hP+q436f\P+q6b75\P+q6b64\P+q6b72\P+q6b6c\P+q2332\P+q2334\P+q2569\P+q2a37\P+q6b31\[?25l[24;1H[1m[37m[41mE348: No string under cursor[m[24;63H[K[24;63H0,0-1[9CAll[1;1H[?12l[?25h[?25l[24;1H[1m--[m[1m[37m[41m4[m[1m INSERT --[m[1m[37m[41mi[m[24;13H[K[24;63H0,1[11CAll[1;1H[?12l[?25h[?25ln[24;63H1,2[1;2H[?12l[?25h[?25lnc[24;65H3[1;3H[?12l[?25h[?25lcl[24;65H4[1;4H[?12l[?25h[?25llu[24;65H5[1;5H[?12l[?25h[?25lud[24;65H6[1;6H[?12l[?25h[?25l[1;5H[K[24;65H5[1;5H[?12l[?25h[?25l[1;4H[K[24;65H4[1;4H[?12l[?25h[?25l[1;3H[K[24;65H3[1;3H[?12l[?25h[?25l[1;2H[K[24;65H2[1;2H[?12l[?25h[?25l[1;1H[K[24;65H1[1;1H[?12l[?25h[?25l#[24;65H2[1;2H[?12l[?25h[?25l#i[24;65H3[1;3H[?12l[?25h[?25lin[24;65H4[1;4H[?12l[?25h[?25lnc[24;65H5[1;5H[?12l[?25h[?25lcl[24;65H6[1;6H[?12l[?25h[?25llu[24;65H7[1;7H[?12l[?25h[?25lud[24;65H8[1;8H[?12l[?25h[?25lde[24;65H9[1;9H[?12l[?25h[?25l[24;65H10[1;10H[?12l[?25h[?25l <[24;66H1[1;11H[?12l[?25h[?25l<i[24;66H2[1;12H[?12l[?25h[?25lio[24;66H3[1;13H[?12l[?25h[?25los[24;66H4[1;14H[?12l[?25h[?25lst[24;66H5[1;15H[?12l[?25h[?25ltr[24;66H6[1;16H[?12l[?25h[?25lre[24;66H7[1;17H[?12l[?25h[?25lea[24;66H8[1;18H[?12l[?25h[?25lam[24;66H9[1;19H[?12l[?25h[?25lm>[24;65H20[1;20H[?12l[?25h[?25l[2;1H[K[24;63H2,1 [2;1H[?12l[?25h[?25l[3;1H[K[24;63H3[3;1H[?12l[?25h[24;1H[K[3;1H[?25l[24;63H3,0-1[9CAll[3;1H[?12l[?25h[?25l[24;63H[K[24;1H:[?12l[?25hS[?25l[?12l[?25hy[?25l[?12l[?25hn[?25l[?12l[?25ht[?25l[?12l[?25ha[?25l[?12l[?25hx[?25l[?12l[?25h[?25l [?12l[?25ho[?25l[?12l[?25hn[?25l[?12l[?25h[?25l[1m[37m[41mE492: Not an editor command: Syntax on[m[24C3,0-1[9CAll[3;1H[?12l[?25h[?25l[24;1H[1m--[m[1m[37m[41m9[m[1m INSERT[m[1m[37m[41m [m[1m --[m[1m[37m[41m [m[24;13H[K[24;63H3,1[11CAll[3;1H[?12l[?25h[?25ly[24;65H2[3;2H[?12l[?25h[?25lyn[24;65H3[3;3H[?12l[?25h[?25lnt[24;65H4[3;4H[?12l[?25h[?25lta[24;65H5[3;5H[?12l[?25h[?25l[3;4H[K[24;65H4[3;4H[?12l[?25h[?25l[3;3H[K[24;65H3[3;3H[?12l[?25h[?25l[3;2H[K[24;65H2[3;2H[?12l[?25h[?25l[3;1H[K[24;65H1[3;1H[?12l[?25h[?25l:[24;65H2[3;2H[?12l[?25h[?25l[3;1H[K[24;65H1[3;1H[?12l[?25h[24;1H[K[3;1H[?25l[24;63H3,0-1[9CAll[3;1H[?12l[?25h[?25l[24;63H[K[24;1H:[?12l[?25hs[?25l[?12l[?25hy[?25l[?12l[?25hn[?25l[?12l[?25ht[?25l[?12l[?25ha[?25l[?12l[?25hx[?25l[?12l[?25h[?25l [?12l[?25ho[?25l[?12l[?25hn[?25l[?12l[?25h[?25l[1;1H[35m#include [m[31m<iostream>[m[24;63H3,0-1[9CAll[3;1H[?12l[?25h[?25l[24;1H[1m-- INSERT --[m[24;63H[K[24;63H3,1[11CAll[3;1H[?12l[?25h[?25lu[24;65H2[3;2H[?12l[?25h[?25lus[24;65H3[3;3H[?12l[?25h[?25lsi[24;65H4[3;4H[?12l[?25h[?25lin[24;65H5[3;5H[?12l[?25h[?25l[33musing[m[24;65H6[3;6H[?12l[?25h[?25l[24;65H7[3;7H[?12l[?25h[?25l n[24;65H8[3;8H[?12l[?25h[?25lna[24;65H9[3;9H[?12l[?25h[?25lam[24;65H10[3;10H[?12l[?25h[?25lme[24;66H1[3;11H[?12l[?25h[?25les[24;66H2[3;12H[?12l[?25h[?25lsp[24;66H3[3;13H[?12l[?25h[?25lpa[24;66H4[3;14H[?12l[?25h[?25lac[24;66H5[3;15H[?12l[?25h[?25l[3;7H[32mnamespace[m[24;66H6[3;16H[?12l[?25h[?25l[24;66H7[3;17H[?12l[?25h[?25l s[24;66H8[3;18H[?12l[?25h[?25lst[24;66H9[3;19H[?12l[?25h[?25ltd[24;65H20[3;20H[?12l[?25h[?25ld;[24;66H1[3;21H[?12l[?25h[?25l[4;1H[K[24;63H4,1 [4;1H[?12l[?25h[?25l[5;1H[K[24;63H5[5;1H[?12l[?25h[?25li[24;65H2[5;2H[?12l[?25h[?25lin[24;65H3[5;3H[?12l[?25h[?25l[32mint[m[24;65H4[5;4H[?12l[?25h[?25l[24;65H5[5;5H[?12l[?25h[?25l m[24;65H6[5;6H[?12l[?25h[?25lma[24;65H7[5;7H[?12l[?25h[?25lai[24;65H8[5;8H[?12l[?25h[?25lin[24;65H9[5;9H[?12l[?25h[?25ln([24;63H[K[24;63H5,10[10CAll[5;10H[?12l[?25h[?25l()[46m()[m[24;63H[K[24;63H5,11[10CAll[5;11H[?12l[?25h[?25l[46m)[m{()[24;63H[K[24;63H5,12[10CAll[5;12H[?12l[?25h[?25l[6;1H[K[24;63H6,1 [6;1H[?12l[?25h[?25l[7;1H[K[24;63H7[7;1H[?12l[?25h[?25l[24;65H2-9[7;9H[?12l[?25h[?25l c[24;65H3-10[7;10H[?12l[?25h[?25lco[24;65H4-11[7;11H[?12l[?25h[?25lou[24;65H5-12[7;12H[?12l[?25h[?25lut[24;65H6-13[7;13H[?12l[?25h[?25l[24;65H7-14[7;14H[?12l[?25h[?25l >[24;65H8-15[7;15H[?12l[?25h[?25l[24;65H9-16[7;16H[?12l[?25h[?25l[24;65H8-15[7;15H[?12l[?25h[?25l[7;14H[K[24;65H7-14[7;14H[?12l[?25h[?25l <[24;65H8-15[7;15H[?12l[?25h[?25l<<[24;65H9-16[7;16H[?12l[?25h[?25l[24;65H10-17[7;17H[?12l[?25h[?25l t[24;66H1-18[7;18H[?12l[?25h[?25lth[24;66H2-19[7;19H[?12l[?25h[?25lhi[24;66H3-20[7;20H[?12l[?25h[?25l[33mthis[m[24;66H4-21[7;21H[?12l[?25h[?25l[24;66H5-22[7;22H[?12l[?25h[?25l[24;66H4-21[7;21H[?12l[?25h[?25lthi[7;20H[K[24;66H3-20[7;20H[?12l[?25h[?25l[7;19H[K[24;66H2-19[7;19H[?12l[?25h[?25l[7;18H[K[24;66H1-18[7;18H[?12l[?25h[?25l[7;17H[K[24;66H0-17[7;17H[?12l[?25h[?25l [31m"[m[24;66H1-18[7;18H[?12l[?25h[?25l[31m"t[m[24;66H2-19[7;19H[?12l[?25h[?25l[31mth[m[24;66H3-20[7;20H[?12l[?25h[?25l[31mhi[m[24;66H4-21[7;21H[?12l[?25h[?25l[31mis[m[24;66H5-22[7;22H[?12l[?25h[?25l[31m [m[24;66H6-23[7;23H[?12l[?25h[?25l[31m w[m[24;66H7-24[7;24H[?12l[?25h[?25l[31mwa[m[24;66H8-25[7;25H[?12l[?25h[?25l[31mas[m[24;66H9-26[7;26H[?12l[?25h[?25l[31m [m[24;65H20-27[7;27H[?12l[?25h[?25l[31m c[m[24;66H1-28[7;28H[?12l[?25h[?25l[31mco[m[24;66H2-29[7;29H[?12l[?25h[?25l[31mod[m[24;66H3-30[7;30H[?12l[?25h[?25l[31mde[m[24;66H4-31[7;31H[?12l[?25h[?25l[31med[m[24;66H5-32[7;32H[?12l[?25h[?25l[31md,[m[24;66H6-33[7;33H[?12l[?25h[?25l[31m [m[24;66H7-34[7;34H[?12l[?25h[?25l[7;33H[K[24;66H6-33[7;33H[?12l[?25h[?25l[7;32H[K[24;66H5-32[7;32H[?12l[?25h[?25l[31m [m[24;66H6-33[7;33H[?12l[?25h[?25l[7;32H[K[24;66H5-32[7;32H[?12l[?25h[?25l[31md,[m[24;66H6-33[7;33H[?12l[?25h[?25l[31m [m[24;66H7-34[7;34H[?12l[?25h[?25l[31m c[m[24;66H8-35[7;35H[?12l[?25h[?25l[31mci[m[24;66H9-36[7;36H[?12l[?25h[?25l[7;35H[K[24;66H8-35[7;35H[?12l[?25h[?25l[31mco[m[24;66H9-36[7;36H[?12l[?25h[?25l[31mom[m[24;65H30-37[7;37H[?12l[?25h[?25l[31mmp[m[24;66H1-38[7;38H[?12l[?25h[?25l[31mpi[m[24;66H2-39[7;39H[?12l[?25h[?25l[31mil[m[24;66H3-40[7;40H[?12l[?25h[?25l[31mle[m[24;66H4-41[7;41H[?12l[?25h[?25l[31med[m[24;66H5-42[7;42H[?12l[?25h[?25l[31md,[m[24;66H6-43[7;43H[?12l[?25h[?25l[31m [m[24;66H7-44[7;44H[?12l[?25h[?25l[31m a[m[24;66H8-45[7;45H[?12l[?25h[?25l[31man[m[24;66H9-46[7;46H[?12l[?25h[?25l[31mnd[m[24;65H40-47[7;47H[?12l[?25h[?25l[31m [m[24;66H1-48[7;48H[?12l[?25h[?25l[31m r[m[24;66H2-49[7;49H[?12l[?25h[?25l[31mru[m[24;66H3-50[7;50H[?12l[?25h[?25l[31mun[m[24;66H4-51[7;51H[?12l[?25h[?25l[31m [m[24;66H5-52[7;52H[?12l[?25h[?25l[31m i[m[24;66H6-53[7;53H[?12l[?25h[?25l[31m [m[24;66H7-54[7;54H[?12l[?25h[?25l[31m r[m[24;66H8-55[7;55H[?12l[?25h[?25l[31mrs[m[24;66H9-56[7;56H[?12l[?25h[?25l[31msh[m[24;65H50-57[7;57H[?12l[?25h[?25l[31mhe[m[24;66H1-58[7;58H[?12l[?25h[?25l[31mel[m[24;66H2-59[7;59H[?12l[?25h[?25l[31mll[m[24;66H3-60[7;60H[?12l[?25h[?25l[7;59H[K[24;66H2-59[7;59H[?12l[?25h[?25l[7;58H[K[24;66H1-58[7;58H[?12l[?25h[?25l[7;57H[K[24;66H0-57[7;57H[?12l[?25h[?25l[7;56H[K[24;65H49-56[7;56H[?12l[?25h[?25l[7;55H[K[24;66H8-55[7;55H[?12l[?25h[?25l[7;54H[K[24;66H7-54[7;54H[?12l[?25h[?25l[7;53H[K[24;66H6-53[7;53H[?12l[?25h[?25l[7;52H[K[24;66H5-52[7;52H[?12l[?25h[?25l[7;51H[K[24;66H4-51[7;51H[?12l[?25h[?25l[31m [m[24;66H5-52[7;52H[?12l[?25h[?25l[31m I[m[24;66H6-53[7;53H[?12l[?25h[?25l[7;52H[K[24;66H5-52[7;52H[?12l[?25h[?25l[31m i[m[24;66H6-53[7;53H[?12l[?25h[?25l[31min[m[24;66H7-54[7;54H[?12l[?25h[?25l[31m [m[24;66H8-55[7;55H[?12l[?25h[?25l[31m r[m[24;66H9-56[7;56H[?12l[?25h[?25l[31mrs[m[24;65H50-57[7;57H[?12l[?25h[?25l[31msh[m[24;66H1-58[7;58H[?12l[?25h[?25l[31mhe[m[24;66H2-59[7;59H[?12l[?25h[?25l[31mel[m[24;66H3-60[7;60H[?12l[?25h[?25l[31mll[m[24;66H4-61[7;61H[?12l[?25h[?25l[31ml![m[24;66H5-62[7;62H[?12l[?25h[?25l[31m!"[m[24;66H6-63[7;63H[?12l[?25h[?25l[24;66H7-64[7;64H[?12l[?25h[?25l <[24;66H8-65[7;65H[?12l[?25h[?25l<<[24;66H9-66[7;66H[?12l[?25h[?25l[24;65H60-67[7;67H[?12l[?25h[?25l e[24;66H1-68[7;68H[?12l[?25h[?25len[24;66H2-69[7;69H[?12l[?25h[?25lnd[24;66H3-70[7;70H[?12l[?25h[?25ldl[24;66H4-71[7;71H[?12l[?25h[?25l[8;1H[K[24;63H8,1    [8;1H[?12l[?25h[?25l[1m[34m~                                                                               [m[24;63H7,64-71[7;71H[?12l[?25h[?25ll;[24;66H5-72[7;72H[?12l[?25h[?25l[8;1H[K[24;63H8,1    [8;1H[?12l[?25h[?25l[24;65H2-9[8;9H[?12l[?25h[?25l r[24;65H3-10[8;10H[?12l[?25h[?25lre[24;65H4-11[8;11H[?12l[?25h[?25let[24;65H5-12[8;12H[?12l[?25h[?25ltu[24;65H6-13[8;13H[?12l[?25h[?25lur[24;65H7-14[8;14H[?12l[?25h[?25l[33mreturn[m[24;65H8-15[8;15H[?12l[?25h[?25l[24;65H9-16[8;16H[?12l[?25h[?25l -[24;65H10-17[8;17H[?12l[?25h[?25l[8;16H[K[24;65H9-16 [8;16H[?12l[?25h[?25l [31m0[m[24;65H10-17[8;17H[?12l[?25h[?25l[31m0[m;[24;66H1-18[8;18H[?12l[?25h[?25l[9;1H[K[24;63H9,1    [9;1H[?12l[?25h[?25l[10;1H[K[24;63H10,1[10;1H[?12l[?25h[?25l}[5;11H[46m{[10;1H}[m[24;63H[K[24;63H10,2[10CAll[10;2H[?12l[?25h[24;1H[K[10;1H[?25l[24;63H10,1[10CAll[10;1H[?12l[?25h[?25l[24;63H[K[24;1H:[?12l[?25hw[?25l[?12l[?25hq[?25l[?12l[?25h[?25l"test.cpp" [New] 10L, 135C written
+[?1l>[?12l[?25h[?1049lnat@Nat-Debian$ g++ test.cpp -o testbin
+nat@Nat-Debian$ ls
+bin	     LICENSE   newfile	  src	   test.cpp
+exec.script  Makefile  README.md  testbin  tests
+nat@Nat-Debian$ ./testbin
+this was coded, compiled, and run in rshell!
+nat@Nat-Debian$ rm testbin test.cpp
+nat@Nat-Debian$ ls
+bin  exec.script  LICENSE  Makefile  newfile  README.md  src  tests
+nat@Nat-Debian$ echo a && echo b && echo c#testing and oper rator
+a
+b
+c
+nat@Nat-Debian$ echo a || echo              cd  echo a | && echo b && cd && echo c#cd doesnt work
+a
+b
 execvp() had an error.
 : No such file or directory
-$ top -i-c
-[?1h=[H[2J[?25l(B[mtop - 18:15:03 up  6:33,  2 users,  load average: 0.02, 0.12, 0.13(B[m[39;49m(B[m[39;49m[K
-Tasks:(B[m[39;49m[1m 124 (B[m[39;49mtotal,(B[m[39;49m[1m   1 (B[m[39;49mrunning,(B[m[39;49m[1m 123 (B[m[39;49msleeping,(B[m[39;49m[1m   0 (B[m[39;49mstopped,(B[m[39;49m[1m   0 (B[m[39;49mzombie(B[m[39;49m(B[m[39;49m[K
-%Cpu(s):(B[m[39;49m[1m  8.5 (B[m[39;49mus,(B[m[39;49m[1m  2.2 (B[m[39;49msy,(B[m[39;49m[1m  0.0 (B[m[39;49mni,(B[m[39;49m[1m 88.3 (B[m[39;49mid,(B[m[39;49m[1m  0.9 (B[m[39;49mwa,(B[m[39;49m[1m  0.0 (B[m[39;49mhi,(B[m[39;49m[1m  0.2 (B[m[39;49msi,(B[m[39;49m[1m  0.0 (B[m[39;49mst(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   720164 (B[m[39;49mused,(B[m[39;49m[1m   306848 (B[m[39;49mfree,(B[m[39;49m[1m    28264 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250768 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-[7m  PID USER      PR  NI  VIRT  RES  SHR S  %CPU %MEM    TIME+  COMMAND           (B[m[39;49m
-(B[m 2164 root      20   0  223m  99m 3352 S   6.3 10.0   7:13.00 /usr/bin/Xorg :0  (B[m[39;49m
-[J[6;1H[K[?12l[?25h[25;1H[?12l[?25h
-$ ti ops -i -c
+nat@Nat-Debian$ echo a || echo b || echo c
+a
+nat@Nat-Debian$ cd || echo b || echo c
 execvp() had an error.
 : No such file or directory
-$ top -i -c
-[?1h=[H[2J[?25l(B[mtop - 18:15:15 up  6:33,  2 users,  load average: 0.01, 0.11, 0.13(B[m[39;49m(B[m[39;49m[K
-Tasks:(B[m[39;49m[1m 124 (B[m[39;49mtotal,(B[m[39;49m[1m   1 (B[m[39;49mrunning,(B[m[39;49m[1m 123 (B[m[39;49msleeping,(B[m[39;49m[1m   0 (B[m[39;49mstopped,(B[m[39;49m[1m   0 (B[m[39;49mzombie(B[m[39;49m(B[m[39;49m[K
-%Cpu(s):(B[m[39;49m[1m  8.5 (B[m[39;49mus,(B[m[39;49m[1m  2.2 (B[m[39;49msy,(B[m[39;49m[1m  0.0 (B[m[39;49mni,(B[m[39;49m[1m 88.3 (B[m[39;49mid,(B[m[39;49m[1m  0.9 (B[m[39;49mwa,(B[m[39;49m[1m  0.0 (B[m[39;49mhi,(B[m[39;49m[1m  0.2 (B[m[39;49msi,(B[m[39;49m[1m  0.0 (B[m[39;49mst(B[m[39;49m(B[m[39;49m[K
-KiB Mem: (B[m[39;49m[1m  1027012 (B[m[39;49mtotal,(B[m[39;49m[1m   720288 (B[m[39;49mused,(B[m[39;49m[1m   306724 (B[m[39;49mfree,(B[m[39;49m[1m    28280 (B[m[39;49mbuffers(B[m[39;49m(B[m[39;49m[K
-KiB Swap:(B[m[39;49m[1m   392188 (B[m[39;49mtotal,(B[m[39;49m[1m    95036 (B[m[39;49mused,(B[m[39;49m[1m   297152 (B[m[39;49mfree,(B[m[39;49m[1m   250768 (B[m[39;49mcached(B[m[39;49m(B[m[39;49m[K
-
-[7m  PID USER      PR  NI  VIRT  RES  SHR S  %CPU %MEM    TIME+  COMMAND           (B[m[39;49m
-[J[6;1H[K[?12l[?25h[25;1H[?12l[?25h
-$ 
-$ 
-$ 
-$ 
-$ 
-$ 
-$ 
-$ #this is a test to show that rshell cannot prcocess Ctrl commands such as Ctrl+c and Ctrl+z.
-$ ^C
-]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ bin/rshell 
-$ ^Z
-[1]+  Stopped                 bin/rshell
-]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ fg
-bin/rshell
-^[OA^[OB        ^C
+b
+nat@Nat-Debian$ # and and or ops work fine when h                                 echo a $$ echo b         && echo b && echo c  ; cd || echo d#t combining &&, ||, and ;
+a
+b
+c
+execvp() had an error.
+: No such file or directory
+d
+nat@Nat-Debian$ ech  o a   || echo b && echo c#this chould process as s a   if the && is an        n ||
+a
+nat@Nat-Debian$ #rshell cannot handle combining && and || if theyr  r are not sepae rated by semicolons
+nat@Nat-Debian$ exit
 ]0;nat@Nat-Debian: ~/cs100/rshellnat@Nat-Debian:~/cs100/rshell$ exit
 exit
 
-Script done on Mon 20 Oct 2014 06:15:37 PM PDT
+Script done on Tue 21 Oct 2014 07:22:41 PM PDT

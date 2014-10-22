@@ -21,8 +21,13 @@ int runCommand(char **argv);
 int main(){
 
 	char *hostname = new char[50];
-		gethostname(hostname, 50);
+	if(gethostname(hostname, 50) == -1){
+		perror("gethostname() failed");
+	}
 	char *login = getlogin();
+	if(login == NULL){
+		perror("getlogin() failed");
+	}
 	
 
 	string input;
