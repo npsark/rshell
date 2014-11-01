@@ -14,7 +14,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <iomanip>
-
+#include <sstream>
+#include <sys/ioctl.h>
 
 #define FLAG_a 1
 #define FLAG_l 2
@@ -30,6 +31,13 @@ bool strCustomCompare( string A, string B);
 
 int main(int argc, char **argv)
 {
+
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+	int windowWidth = w.ws_col;
+
+
 	int flags = 0;
 
 	string dirName = ".";
@@ -55,8 +63,6 @@ int main(int argc, char **argv)
 	if(flags & FLAG_R);// cout << "R" << endl;
 
 	vector<string> files;
-	//char *dirName = new char[5];
-	//strcpy(dirName, ".");
 
 
 	DIR *dirp = opendir(dirName.c_str());
@@ -89,28 +95,36 @@ int main(int argc, char **argv)
 		}
 	}
 
-	struct stat statBuff;
-
-	int widest = 0;
+	int totalCharCount = 0;
 	
-	if(flags & FLAG_l){
-		
-		int biggest = 0;
-
-		for(uint i=0; i<files.size(); i++){
-			stat(files[i].c_str(), &statBuff);
-			if( biggest < statBuff.st_size){
-				biggest = statBuff.st_size;
-			}
-		}
-		
-		char *intStr = new char[10];
-		widest = to_string(biggest).length();
-	
+	for(uint i=0; i<files.size(); i++){
+		totalCharCount += files[i].length();
 	}
+	totalCharCount += (files.size())*2;
+
+	struct stat statBuff;
+	int widestSize = 0;
 
 
+		
+	int biggestSize = 0;
+	uint widestName = 0;
+	for(uint i=0; i<files.size(); i++){
+		stat(files[i].c_str(), &statBuff);
+		if( biggestSize < statBuff.st_size){
+			biggestSize = statBuff.st_size;
+		}
+		if( widestName < files[i].length() ){
+			widestName = files[i].length();
+		}
+
+	}
 	
+	stringstream ss;
+	ss << biggestSize;
+	widestSize = ss.str().length();
+
+	int howManyPrinted = 0;
 
 	for(uint i=0; i<files.size(); i++){
 		if(flags & FLAG_l){
@@ -156,10 +170,25 @@ int main(int argc, char **argv)
 			}else{ cout << "-"; }
 
 			cout << " " << statBuff.st_nlink;
-			cout << " " << getpwuid(statBuff.st_uid)->pw_name;
-			cout << " " << getgrgid(statBuff.st_gid)->gr_name;
+			
+			struct passwd *uID = getpwuid(statBuff.st_uid);
+			struct group *gID = getgrgid(statBuff.st_gid);
 
-			cout << " " << setw(widest) << statBuff.st_size;
+			if(uID){
+				cout << " " << getpwuid(statBuff.st_uid)->pw_name;
+			}else{
+				cout << " ";
+				//perror("getpwuid");
+			}
+			
+			if(gID){		
+				cout << " " << getgrgid(statBuff.st_gid)->gr_name;
+			}else{
+				cout << " ";
+				//perror("getgrgid");
+			}
+
+			cout << " " << setw(widestSize) << statBuff.st_size;
 
 
 			time_t t = statBuff.st_mtime;
@@ -171,20 +200,27 @@ int main(int argc, char **argv)
 			cout << " " << buffer << " "; //puts prints the content of the c-string, which in this case contains the time
 
 
-			//cout << " " << statBuff.st_ctime;
 
 
 
 			cout << files[i] << "\t" << endl;
-		}else{		
-			cout << files[i] << "  ";
-		}
+		}else{	
+			if(totalCharCount > windowWidth){
+				if( uint(howManyPrinted + 1) > windowWidth/(widestName+1) ){
+					cout << endl;
+					howManyPrinted = 0;
+				}
+				howManyPrinted += 1;	
+				cout << left << setw(widestName+1) << files[i];
+			}else{
+				cout << files[i] << "  ";
+			}
+		 }
 	}
-	cout << endl;
-
-
-
 	
+
+
+	if(!(flags & FLAG_l)) cout << endl;
 
 
 	if(closedir(dirp) == -1){
