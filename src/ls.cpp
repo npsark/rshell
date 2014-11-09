@@ -13,15 +13,53 @@
 #include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <iomanip>
 #include <sstream>
 #include <sys/ioctl.h>
+#include <sys/types.h>
+#include <sys/wait.h>
+
+
+
+
 
 #define FLAG_a 1
 #define FLAG_l 2
 #define FLAG_R 4
 
 using namespace std;
+
+
+int runCommand(char **argv){
+
+	int status = 0;
+
+	int pid = fork();
+	if(pid == -1){
+
+		perror("fork() had an error.\n");
+		exit(1);
+
+	}else if(pid == 0){//child
+
+		if(execvp(argv[0], argv) == -1){
+			perror("execvp() had an error.\n");
+		}
+		
+		exit(1);
+
+	}else if(pid > 0){//parent
+		
+		if(wait(&status) == -1){
+			perror("wait() had an error.\n");
+		}
+
+	}
+	
+	return status;
+
+}
 
 
 
@@ -126,13 +164,18 @@ int main(int argc, char **argv)
 
 	int howManyPrinted = 0;
 
+	vector<string> dirs;
+
 	for(uint i=0; i<files.size(); i++){
+
 		if(flags & FLAG_l){
+
 			stat(files[i].c_str(), &statBuff);
 
 
 			if(S_ISDIR(statBuff.st_mode)){
 				cout << "d";
+				dirs.push_back(files[i]);
 			}else if(S_ISLNK(statBuff.st_mode)){
 				cout << "s";
 			}else{ cout << "-"; }
@@ -159,6 +202,7 @@ int main(int argc, char **argv)
 				cout << "x";
 			}else{ cout << "-"; }
 			
+
 			if(statBuff.st_mode & S_IRWXO & S_IROTH){
 				cout << "r";
 			}else{ cout << "-"; }
@@ -200,11 +244,16 @@ int main(int argc, char **argv)
 			cout << " " << buffer << " "; //puts prints the content of the c-string, which in this case contains the time
 
 
-
-
-
 			cout << files[i] << "\t" << endl;
 		}else{	
+
+			stat(files[i].c_str(), &statBuff);
+
+			if(S_ISDIR(statBuff.st_mode)){
+				dirs.push_back(files[i]);
+			}
+
+
 			if(totalCharCount > windowWidth){
 				if( uint(howManyPrinted + 1) > windowWidth/(widestName+1) ){
 					cout << endl;
@@ -215,9 +264,28 @@ int main(int argc, char **argv)
 			}else{
 				cout << files[i] << "  ";
 			}
-		 }
+
+		}
+
 	}
-	
+	cout << endl;
+
+	for(uint k=0; k<dirs.size(); k++){
+		cout << dirs[k] << ":" << endl;
+
+		char **args = new char*[3];
+			
+		args[0] = new char[100];
+		strcpy( args[0], "/home/nat/cs100/rshell/bin/ls" );
+
+		args[1] = new char[dirs[k].length() + 1];
+		strcpy( args[1], dirs[k].c_str() );
+
+		args[2] = NULL;
+
+		runCommand(args);
+	}
+
 
 
 	if(!(flags & FLAG_l)) cout << endl;
@@ -226,6 +294,7 @@ int main(int argc, char **argv)
 	if(closedir(dirp) == -1){
 		perror("closedir");
 	}
+
 }
 
 
