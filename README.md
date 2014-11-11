@@ -95,5 +95,26 @@ Enter the following commands into *bash*:
 
 After entering these commands, the *ls* program will be stored under the `bin` directory.
 
+##Valgrind Test
+```
+root@Nat-Debian:/home/nat/cs100/rshell# valgrind bin/ls 
+==6134== Memcheck, a memory error detector
+==6134== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==6134== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==6134== Command: bin/ls
+==6134== 
+bin  dir  LICENSE  Makefile  README.md  README.md~  src  tests  
+
+==6134== 
+==6134== HEAP SUMMARY:
+==6134==     in use at exit: 0 bytes in 0 blocks
+==6134==   total heap usage: 225 allocs, 225 frees, 42,802 bytes allocated
+==6134== 
+==6134== All heap blocks were freed -- no leaks are possible
+==6134== 
+==6134== For counts of detected and suppressed errors, rerun with: -v
+==6134== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 4 from 4)
+```
+
 ##Bugs
 1. 
