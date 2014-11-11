@@ -123,4 +123,7 @@ Checking src/ls.cpp...
 nat@Nat-Debian:~/cs100/rshell$
 ```
 ##Bugs
-1. 
+1. An extra line is printed after the main output is diplayed.
+2. The total number of blocks that is printed at the top of the output witht the `-l` parameter is sometimes off. It seems to typically be smaller than it should be.
+3. There is a slight difference in how the list of files to be printed are alphabetized. For example, the standard `ls` prints the first four files of the *rshell* directory as `.  ..  bin  dir  .git` while this version of ls prints '.  ..  .git  bin  dir'.
+4. The standard `ls` prints different file types in different colors. This version simply prints every type of file in the same color.
