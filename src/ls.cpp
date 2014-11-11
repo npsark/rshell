@@ -112,7 +112,6 @@ int main(int argc, char **argv){
 
 		if( stat(dirPaths[p].c_str(), &isDirStatBuff) == -1 ){
 			perror("stat");
-			exit(1);
 		}
 
 		if( !(S_ISDIR(isDirStatBuff.st_mode)) ){
