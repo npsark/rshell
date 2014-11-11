@@ -85,13 +85,15 @@ int main(int argc, char **argv){
 			if( toAdd[ toAdd.length()-1 ] == '/' ){
 				toAdd.erase( toAdd.begin() + toAdd.length()-1 );
 			}
-		
-			if(toAdd[0] == '/'){			
-				dirPaths.push_back(toAdd);
-				dirNames.push_back(toAdd);
-			}else{
-				dirPaths.push_back( cwd + "/" + toAdd );
-				dirNames.push_back( toAdd );
+
+			if(toAdd != cwd){
+				if(toAdd[0] == '/'){			
+					dirPaths.push_back(toAdd);
+					dirNames.push_back(toAdd);
+				}else{
+					dirPaths.push_back( cwd + "/" + toAdd );
+					dirNames.push_back( toAdd );
+				}
 			}
 		}
 	}
@@ -110,11 +112,15 @@ int main(int argc, char **argv){
 	for( uint p=0; p<dirPaths.size(); p++){
 		struct stat isDirStatBuff;
 
-		if( stat(dirPaths[p].c_str(), &isDirStatBuff) == -1 ){
-			perror("stat");
+		if( lstat(dirPaths[p].c_str(), &isDirStatBuff) == -1 ){
+			perror("lstat");
 		}
 
+
 		if( !(S_ISDIR(isDirStatBuff.st_mode)) ){
+			
+			
+
 			notDirFiles.push_back(dirPaths[p]);
 			notDirNames.push_back(dirNames[p]);
 
@@ -124,15 +130,7 @@ int main(int argc, char **argv){
 			continue;
 		}
 
-		if( S_ISLNK(isDirStatBuff.st_mode) ){
-			cout << "LINKLINKLINKLINKLINKLINKLINKLLINKLIN!!!" << endl;
-			if( readlink( dirPaths[p].c_str(), new char[1024], 1024) == -1 ){
-				dirPaths.erase(dirPaths.begin() + p);
-				dirNames.erase(dirNames.begin() + p);
-				p = -1;
-				continue;
-			}
-		}		
+				
 
 	}
 
@@ -240,7 +238,7 @@ int main(int argc, char **argv){
 				string fullFilePath = filePaths[i];// +  files[i];
 				
 
-				if( stat(fullFilePath.c_str(), &dirStatBuff) == -1 ){
+				if( lstat(fullFilePath.c_str(), &dirStatBuff) == -1 ){
 					perror("stat");
 					exit(1);
 				}
@@ -342,7 +340,7 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 	
 	int totalBlocks = 0;
 	for(uint i=0; i<filePaths.size(); i++){
-		if( stat(filePaths[i].c_str(), &statBuff) == -1 ){
+		if( lstat(filePaths[i].c_str(), &statBuff) == -1 ){
 			perror("stat");
 			exit(1);
 		}
@@ -369,7 +367,7 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 		cout << "total " << totalBlocks << endl;
 
 	for(uint i=0; i<filePaths.size(); i++){
-		if(stat(filePaths[i].c_str(), &statBuff) == -1){
+		if(lstat(filePaths[i].c_str(), &statBuff) == -1){
 			perror("stat");
 			exit(1);
 		}
@@ -377,7 +375,7 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 		if(S_ISDIR(statBuff.st_mode)){
 			cout << "d";
 		}else if(S_ISLNK(statBuff.st_mode)){
-			cout << "s";
+			cout << "l";
 		}else{ cout << "-"; }
 	
 
@@ -514,8 +512,7 @@ void populateWindowStats(struct windowStats *winStats,  vector<string> filePaths
 	winStats->widestName = 0;//this will contain the length of the longest file name to be printed.
 	for(uint i=0; i<fileNames.size(); i++){
 
-		if( stat(filePaths[i].c_str(), statBuff) == -1 ){	
-			cout << "error: " << filePaths[i] << endl;
+		if( lstat(filePaths[i].c_str(), statBuff) == -1 ){	
 			perror("stat");
 			exit(1);
 		}
