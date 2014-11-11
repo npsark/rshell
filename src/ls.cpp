@@ -19,7 +19,7 @@
 #include <errno.h>
 #include <grp.h>
 #include <pwd.h>
-
+#include <math.h>
 
 
 
@@ -40,26 +40,34 @@ struct windowStats {
 
 int runCommand(char **argv);
 void outputFlag_NOT_L(struct stat statBuff, vector<string> files, struct windowStats *winStats);
-void outputFlag_L(struct stat statBuff, vector<string> files, struct windowStats *winStats, bool printTot = true);
+void outputFlag_L(struct stat statBuff,  vector<string> filePaths, vector<string> fileNames, struct windowStats *winStats, bool printTot = true);
 bool strCustomCompare( string A, string B);
-void populateWindowStats(struct windowStats *winStats, vector<string> files, struct stat *statBuff);
+void populateWindowStats(struct windowStats *winStats, vector<string> filePaths, vector<string> fileNames, struct stat *statBuff);
 
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv){
+	
+	char wdbuff[1024];
+	getcwd(wdbuff, sizeof(wdbuff));
+	string cwd = wdbuff;
+
+	
 	struct windowStats winStats;
 
 	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+	if( ioctl(STDOUT_FILENO, TIOCGWINSZ, &w) == -1 ){
+		perror("ioctl");
+		exit(1);
+	}
 
 	winStats.windowWidth = w.ws_col;
 
 
 	int flags = 0;
 
-	vector<string> dirNames;
-		//dirNames.push_back(".");
-	uint dirCount = 0;
+
+	vector<string> dirNames, dirPaths;
 
 	for(uint i=1; argv[i]!=0; i++){
 		if(argv[i][0] == '-'){
@@ -73,65 +81,91 @@ int main(int argc, char **argv)
 				}
 			}
 		}else{
-			dirCount++;
-			dirNames.push_back(string(argv[i]));
+			string toAdd = string( argv[i] );
+			if( toAdd[ toAdd.length()-1 ] == '/' ){
+				toAdd.erase( toAdd.begin() + toAdd.length()-1 );
+			}
+		
+			if(toAdd[0] == '/'){			
+				dirPaths.push_back(toAdd);
+				dirNames.push_back(toAdd);
+			}else{
+				dirPaths.push_back( cwd + "/" + toAdd );
+				dirNames.push_back( toAdd );
+			}
 		}
 	}
 
-	if(dirCount == 0){
+	if(dirPaths.size() == 0){
+		dirPaths.push_back(cwd);
 		dirNames.push_back(".");
 	}
 
+	sort( dirPaths.begin(), dirPaths.end(), strCustomCompare );//alphabetize directory paths
 	sort( dirNames.begin(), dirNames.end(), strCustomCompare );//alphabetize directory names	
 
-	vector<string> notDirFiles;
+	vector<string> notDirFiles, notDirNames;
 
-	for( uint p=0; p<dirNames.size(); p++){
-		//DIR *dirp = NULL;
 
+	for( uint p=0; p<dirPaths.size(); p++){
 		struct stat isDirStatBuff;
-		stat(dirNames[p].c_str(), &isDirStatBuff);
+
+		if( stat(dirPaths[p].c_str(), &isDirStatBuff) == -1 ){
+			perror("stat");
+			exit(1);
+		}
 
 		if( !(S_ISDIR(isDirStatBuff.st_mode)) ){
-			notDirFiles.push_back(dirNames[p]);
+			notDirFiles.push_back(dirPaths[p]);
+			notDirNames.push_back(dirNames[p]);
+
+			dirPaths.erase(dirPaths.begin() + p);
 			dirNames.erase(dirNames.begin() + p);
 			p = -1;
+			continue;
 		}
+
+		if( S_ISLNK(isDirStatBuff.st_mode) ){
+			cout << "LINKLINKLINKLINKLINKLINKLINKLLINKLIN!!!" << endl;
+			if( readlink( dirPaths[p].c_str(), new char[1024], 1024) == -1 ){
+				dirPaths.erase(dirPaths.begin() + p);
+				dirNames.erase(dirNames.begin() + p);
+				p = -1;
+				continue;
+			}
+		}		
+
 	}
 
 	if(notDirFiles.size() > 0){
 
 		struct stat statBuff2;
 	
-		populateWindowStats(&winStats, notDirFiles, &statBuff2);
+		populateWindowStats(&winStats, notDirFiles, notDirNames, &statBuff2);
 		
 		if(flags & FLAG_l){
-	
-			outputFlag_L(statBuff2, notDirFiles, &winStats, false);
-
+			outputFlag_L(statBuff2, notDirFiles, notDirNames, &winStats, false);
 		}else{	
-
 			outputFlag_NOT_L(statBuff2, notDirFiles, &winStats);
-
 		}
 
 		cout << endl << endl;
-
 	}
 
-	for( uint p=0; p<dirNames.size(); p++){
-		
-		vector<string> files;
+	
+
+	for( uint p=0; p<dirPaths.size(); p++){
+		vector<string> filePaths, fileNames;
 		DIR *dirp = NULL;
 
-		if(dirNames.size() > 1){
+		if(dirPaths.size() > 1){
 			if( !(flags & FLAG_R) ){
 				cout << dirNames[p] << ":" << endl;
 			}
 		}
 
 
-		dirp = opendir(dirNames[p].c_str());
+		dirp = opendir(dirPaths[p].c_str());
 		if(dirp == NULL){
 			perror("opendir");
 			return 1;
@@ -145,45 +179,53 @@ int main(int argc, char **argv)
 				perror("readdir");
 			}
 
-			string currFile = direntp->d_name;
-			files.push_back(currFile);
+			
+			string currFile = "";
+			if(dirPaths[p] != "/"){
+				currFile = dirPaths[p] + "/" + direntp->d_name;
+			}else{
+				currFile = "/";
+				currFile += direntp->d_name;
+			}
+			filePaths.push_back(currFile);
+			fileNames.push_back(direntp->d_name);
+			
 		}
 
-		sort( files.begin(), files.end(), strCustomCompare );//alphabetize file names
-	
-
-		
-
+		sort( filePaths.begin(), filePaths.end(), strCustomCompare );//alphabetize file names
+		sort( fileNames.begin(), fileNames.end(), strCustomCompare );//alphabetize file names
 
 
 		if(!(flags & FLAG_a)){//if -a is not a parameter, delete all file names that start with '.'
-			for(uint i=0; i<files.size(); i++){		
-				if(files[i][0] == '.'){
-					files.erase(files.begin()+i);
+			for(uint i=0; i<fileNames.size(); i++){		
+				if(fileNames[i][0] == '.'){
+					filePaths.erase(filePaths.begin()+i);
+					fileNames.erase(fileNames.begin()+i);					
 					i=-1;
 				}
 			}
 		}
 		struct stat statBuff;
-		
-		populateWindowStats(&winStats, files, &statBuff);
+
+		populateWindowStats(&winStats, filePaths, fileNames, &statBuff);
 	
 	
 		vector<string> dirs;
 
 
 		if(flags & FLAG_R){
-			cout << dirNames[p] << ":" << endl;
+			if(dirNames[p].find(cwd) != string::npos){
+				cout << dirNames[p].substr( cwd.length()+1 );
+			}else{
+				cout << dirNames[p];
+			}
+			cout << ":" << endl;
 		}
 
 		if(flags & FLAG_l){
-		
-			outputFlag_L(statBuff, files, &winStats);
-
+			outputFlag_L(statBuff, filePaths, fileNames, &winStats);
 		}else{	
-
-			outputFlag_NOT_L(statBuff, files, &winStats);
-
+			outputFlag_NOT_L(statBuff, fileNames, &winStats);
 		}
 
 		if( !(flags & FLAG_R) ){
@@ -192,14 +234,22 @@ int main(int argc, char **argv)
 
 		if(flags & FLAG_R){
 
-
 			struct stat dirStatBuff;
-			for(uint i=0; i<files.size(); i++){//collect all the file names that represent directories
-				string fullFilePath = dirNames[p] + "/" + files[i];
-				stat(fullFilePath.c_str(), &dirStatBuff);
-				if( S_ISDIR(dirStatBuff.st_mode) ){
-					dirs.push_back(files[i]);
+
+			for(uint i=0; i<filePaths.size(); i++){//collect all the file names that represent directories
+
+				string fullFilePath = filePaths[i];// +  files[i];
+				
+
+				if( stat(fullFilePath.c_str(), &dirStatBuff) == -1 ){
+					perror("stat");
+					exit(1);
 				}
+
+				if( S_ISDIR(dirStatBuff.st_mode) ){
+					dirs.push_back(fullFilePath);
+				}
+
 			}
 
 
@@ -211,22 +261,16 @@ int main(int argc, char **argv)
 		
 			for(uint k=0; k<dirs.size(); k++){
 				if(dirs[k] != "." && dirs[k] != ".."){
-					//cout << dirs[k] << ":" << endl;
 
 					char **args = new char*[4];//build arguments array to pass to execvp via runCommand().
 			
 					args[0] = new char[100];//first element will contain the path to this program.
 					strcpy( args[0], "/home/nat/cs100/rshell/bin/ls" );
 			
-					string childDir = dirNames[p];
+					string childDir = dirs[k];
 
-					if(dirNames[p] != "/"){
-						childDir += "/" + dirs[k];
-					}else{
-						childDir += dirs[k];
-					}
-					args[1] = new char[childDir.length() + 1];
-					strcpy( args[1], childDir.c_str() );
+					args[1] = new char[dirs[k].length() + 1];//childDir.length() + 1];
+					strcpy( args[1], dirs[k].c_str() );//childDir.c_str() );
 
 					string params = "-";
 					if( flags & FLAG_a ){
@@ -245,10 +289,6 @@ int main(int argc, char **argv)
 					args[3] = NULL;
 
 					runCommand(args);
-					//cout << "HEYO" << endl;
-					//if( k < dirs.size()-1 ){
-					//	cout << endl;
-					//}
 				}
 			}
 		}
@@ -262,9 +302,7 @@ int main(int argc, char **argv)
 				perror("closedir");
 			}	
 		}
-		if(p < dirNames.size() - 1){
-			//cout << endl;
-		}
+		
 	}
 }
 
@@ -276,13 +314,13 @@ int runCommand(char **argv){
 	int pid = fork();
 	if(pid == -1){
 
-		perror("fork() had an error.\n");
+		perror("fork()");
 		exit(1);
 
 	}else if(pid == 0){//child
 
 		if(execvp(argv[0], argv) == -1){
-			perror("execvp() had an error.\n");
+			perror("execvp()");
 		}
 		
 		exit(1);
@@ -290,7 +328,7 @@ int runCommand(char **argv){
 	}else if(pid > 0){//parent
 		
 		if(wait(&status) == -1){
-			perror("wait() had an error.\n");
+			perror("wait()");
 		}
 
 	}
@@ -301,12 +339,41 @@ int runCommand(char **argv){
 
 
 
-void outputFlag_L(struct stat statBuff, vector<string> files, struct windowStats *winStats, bool printTot){
-	if(printTot)	
-		cout << "total " << files.size() << endl;
+void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string> fileNames, struct windowStats *winStats, bool printTot){
+	
+	int totalBlocks = 0;
+	for(uint i=0; i<filePaths.size(); i++){
+		if( stat(filePaths[i].c_str(), &statBuff) == -1 ){
+			perror("stat");
+			exit(1);
+		}
+		if(4 >= statBuff.st_size/1024){
+			totalBlocks += 4;
+		}else{
+			float toAdd = statBuff.st_size;
+			int numOfDivs = 0;
+			while( toAdd>10 ){
+				toAdd /= 10;
+				numOfDivs++;
+			}
 
-	for(uint i=0; i<files.size(); i++){
-		stat(files[i].c_str(), &statBuff);
+			toAdd = ceil(toAdd);
+
+			for(int h=0; h<numOfDivs; h++){
+				toAdd *= 10;
+			}
+			totalBlocks += ceil(toAdd/1024);
+		}
+	}
+
+	if(printTot)	
+		cout << "total " << totalBlocks << endl;
+
+	for(uint i=0; i<filePaths.size(); i++){
+		if(stat(filePaths[i].c_str(), &statBuff) == -1){
+			perror("stat");
+			exit(1);
+		}
 
 		if(S_ISDIR(statBuff.st_mode)){
 			cout << "d";
@@ -355,14 +422,14 @@ void outputFlag_L(struct stat statBuff, vector<string> files, struct windowStats
 		if(uID){
 			cout << " " << getpwuid(statBuff.st_uid)->pw_name;
 		}else{
-			cout << " ";
+			cout << " ?";
 			//perror("getpwuid");
 		}
 	
 		if(gID){		
 			cout << " " << getgrgid(statBuff.st_gid)->gr_name;
 		}else{
-			cout << " ";
+			cout << " ?";
 			//perror("getgrgid");
 		}
 
@@ -372,20 +439,23 @@ void outputFlag_L(struct stat statBuff, vector<string> files, struct windowStats
 		time_t t = statBuff.st_mtime;
 	
 		tm * tminfo = localtime(&t);
+		if( tminfo == NULL ){
+			perror("localtime()");
+			exit(1);
+		}
 		char buffer[50]; //c-string buffer of size 50
 
 		strftime(buffer, 50, "%b %d %R", tminfo);
 		cout << " " << buffer << " "; //puts prints the content of the c-string, which in this case contains the time
 
 
-		cout << files[i] << "\t";
+		cout << fileNames[i] << "\t";
 		if(printTot) cout << endl;
 	}
 }
 
-void outputFlag_NOT_L(struct stat statBuff, vector<string> files, struct windowStats *winStats){
-	for(uint i=0; i<files.size(); i++){
-		//cout << endl;
+void outputFlag_NOT_L(struct stat statBuff, vector<string> fileNames, struct windowStats *winStats){
+	for(uint i=0; i<fileNames.size(); i++){
 
 		if(int(winStats->totalCharCount) > int(winStats->windowWidth)){
 			if( uint(winStats->howManyPrinted + 1) > winStats->windowWidth/(winStats->widestName+1) ){
@@ -393,9 +463,9 @@ void outputFlag_NOT_L(struct stat statBuff, vector<string> files, struct windowS
 				winStats->howManyPrinted = 0;
 			}
 			winStats->howManyPrinted += 1;	
-			cout << left << setw(winStats->widestName+1) << files[i];
+			cout << left << setw(winStats->widestName+1) << fileNames[i];
 		}else{
-			cout << files[i] << "  ";
+			cout << fileNames[i] << "  ";
 		}
 
 	}
@@ -431,27 +501,31 @@ bool strCustomCompare( string A, string B){
 }
 
 
-void populateWindowStats(struct windowStats *winStats, vector<string> files, struct stat *statBuff){
+void populateWindowStats(struct windowStats *winStats,  vector<string> filePaths, vector<string> fileNames, struct stat *statBuff){
 	winStats->totalCharCount = 0;//this will contain the total number of charachters to be printed.
 	
-	for(uint i=0; i<files.size(); i++){
-		winStats->totalCharCount += files[i].length();//add the number of chars in each file name to be printed.
+	for(uint i=0; i<fileNames.size(); i++){
+		winStats->totalCharCount += fileNames[i].length();//add the number of chars in each file name to be printed.
 	}
-	winStats->totalCharCount += (files.size())*2;//add 2 for each space between file names.
+	winStats->totalCharCount += (fileNames.size())*2;//add 2 for each space between file names.
 
 	
 
 	int biggestSize = 0;//this will contain the largest file size of the files to be printed.
 	winStats->widestName = 0;//this will contain the length of the longest file name to be printed.
-	for(uint i=0; i<files.size(); i++){
+	for(uint i=0; i<fileNames.size(); i++){
 
-		stat(files[i].c_str(), statBuff);
+		if( stat(filePaths[i].c_str(), statBuff) == -1 ){	
+			cout << "error: " << filePaths[i] << endl;
+			perror("stat");
+			exit(1);
+		}
 
 		if( biggestSize < statBuff->st_size){
 			biggestSize = statBuff->st_size;
 		}
-		if( int(winStats->widestName) < int(files[i].length()) ){
-			winStats->widestName = files[i].length();
+		if( int(winStats->widestName) < int(fileNames[i].length()) ){
+			winStats->widestName = fileNames[i].length();
 		}
 
 	}
