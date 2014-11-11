@@ -84,7 +84,7 @@ At this point, *ls* is capable of:
 
 As far as arguments are concerned, *ls* is fairly robust. Any number of arguments can be passed with any number of spaces in between any of them. The arguments can also be placed anywhere amongst the file paths. Furthermore, any combination of the three parameters can be passed with any number of them separate or combined (`-alR` = `-a -lR` = `-al -R` = `-lRa` = `-Ral` = etc.).
 
-When a path is passed, ls checks if it starts with the '/' character. If it does, it assumed it is an absolute path. If it does not start with the '/' character, it assumes it is a relative path. For ecample, `/home/nat/rshell/bin` is the same as `bin`. However, `/bin` is not the same as `bin`. Also, any '/' characters at the end of the path are ignored (i.e. `bin/` = `bin`).
+When a path is passed, ls checks if it starts with the '/' character. If it does, it assumed it is an absolute path. If it does not start with the '/' character, it assumes it is a relative path. For example, `/home/nat/rshell/bin` is the same as `bin`. However, `/bin` is not the same as `bin`. Also, any '/' characters at the end of the path are ignored (i.e. `bin/` = `bin`).
 
 ##Building
 
@@ -145,7 +145,7 @@ At this point, *cp* is capable of:
 * handling nonexistent input paths.
 * handling input paths that point to directories.
 
-If the user enters more than two paths or less than 1 path, cp throws an error. If the input path is a directory, or does not exist, an error is thrown. The optional parameter must be a '-' character followed by anything other than '0' in order for the full report to be printed.
+If the user enters more than two paths or less than 1 path, cp throws an error. If the input path is a directory, or does not exist, an error is thrown. If the output path already exists, an error is thrown. The optional parameter must be a '-' character followed by anything other than '0' in order for the full report to be printed.
 
 ##Building
 
