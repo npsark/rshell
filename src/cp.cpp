@@ -27,6 +27,10 @@ void cpFStream(string in, string out){
 
 	outFile.open(out.c_str(), ofstream::trunc);
 
+	if(outFile.fail()){
+		cerr << "failed to open." << endl;
+	}
+
 
 	while(inFile.good()){
 		char c = inFile.get();
@@ -35,6 +39,8 @@ void cpFStream(string in, string out){
 		}
 	}
 
+	inFile.close();
+	outFile.close();
 }
 
 
@@ -44,7 +50,17 @@ void cpRDWR(string in, string out, int buffSize){
 
 
 	int infd = open(in.c_str(), O_RDONLY);
+	if(infd == -1){
+		perror("open");
+		exit(1);
+	}
+
 	int outfd = open(out.c_str(), O_RDWR|O_CREAT|O_TRUNC, statBuff.st_mode);
+	if(outfd == -1){
+		perror("open");
+		exit(1);
+	}	
+
 	char *buff = new char[buffSize];
 	int readVal = read(infd, buff, buffSize);
 	while( 1 ){
@@ -54,7 +70,7 @@ void cpRDWR(string in, string out, int buffSize){
 		}else if(readVal == 0){
 			break;
 		}
-		int writeVal = write(outfd, buff, buffSize);
+		int writeVal = write(outfd, buff, readVal);
 		if(writeVal == -1){
 			perror("write");
 			exit(1);
@@ -62,7 +78,14 @@ void cpRDWR(string in, string out, int buffSize){
 		readVal = read(infd, buff, buffSize);
 	}
 
-
+	if(close(infd) == -1){
+		perror("close");
+		exit(1);
+	}
+	if(close(outfd) == -1){
+		perror("close");
+		exit(1);
+	}
 }
 
 
@@ -81,20 +104,38 @@ bool fileExists(string file){
 
 int main(int argc, char **argv){
 	
-	string in, out, report = "0";
+	string in, out, report = "-0";
 
-	for(int i=1; argv[i]; i++){
-		if(i == 1){
-			in = argv[i];
-		}else if(i == 2){
-			out = argv[i];
-		}else if(i == 3){
+	int fileCount = 0;
+	int i;
+	for(i=1; argv[i]; i++){
+		if(argv[i][0] == '-'){
 			report = argv[i];
+		}else{
+			if(fileCount >= 2){
+				cerr << "too many file paths." << endl;
+				exit(1);
+			}
+	
+			if(fileCount == 0){
+				in = argv[i];
+				fileCount++;
+			}else{
+				out = argv[i];
+				fileCount++;
+			}
 		}
+	}
+	if(i < 3){
+		cerr << "not enough arguments." << endl;
+		exit(1);
 	}
 
 	struct stat statBuff;
-	stat(in.c_str(), &statBuff);
+	if(stat(in.c_str(), &statBuff) == -1){
+		perror("stat");
+		exit(1);
+	}
 
 	if( S_ISDIR( statBuff.st_mode) ){
 		cerr << "input is a directory" << endl;
@@ -109,7 +150,7 @@ int main(int argc, char **argv){
 		return 1;
 	}else{
 
-		if(report[0] == '0'){
+		if(report[1] == '0'){
 			cpRDWR(in, out, BUFSIZ);
 		}else{
 			Timer t;
