@@ -68,6 +68,9 @@ After entering these commands, the *ls* program will be stored under the `bin` d
 5. *rshell* does not parse tabs correctly. For example, assuming 'T' represents a tab, `echo TTT"hello world"` would throw an error saying it can't find the directory.
 
 
+
+
+
 LS
 
 ##Purpose
