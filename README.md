@@ -116,5 +116,11 @@ bin  dir  LICENSE  Makefile  README.md  README.md~  src  tests
 ==6134== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 4 from 4)
 ```
 
+##CPPCheck Test
+```
+nat@Nat-Debian:~/cs100/rshell$ cppcheck src/ls.cpp 
+Checking src/ls.cpp...
+nat@Nat-Debian:~/cs100/rshell$
+```
 ##Bugs
 1. 
