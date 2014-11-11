@@ -49,11 +49,11 @@ Of course, this is only relevent for compound commands. Single commands simply e
 
 ##Building
 
-`git clone https://github.com/npsark/rshell.git '
+`git clone https://github.com/npsark/rshell.git
 
 cd rshell
 
-make rshell
+make rshell`
 
 After entering these commands in order, the *rshell* program will be stored under the `bin` directory.
 
