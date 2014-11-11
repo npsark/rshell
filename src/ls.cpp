@@ -82,12 +82,14 @@ int main(int argc, char **argv){
 			}
 		}else{
 			string toAdd = string( argv[i] );
-			if( toAdd[ toAdd.length()-1 ] == '/' ){
-				toAdd.erase( toAdd.begin() + toAdd.length()-1 );
+			if(toAdd.length() > 1){
+				if( toAdd[ toAdd.length()-1 ] == '/' ){
+					toAdd.erase( toAdd.begin() + toAdd.length()-1 );
+				}
 			}
 
 			if(toAdd != cwd){
-				if(toAdd[0] == '/'){			
+				if(toAdd[0] == '/'){
 					dirPaths.push_back(toAdd);
 					dirNames.push_back(toAdd);
 				}else{
@@ -337,7 +339,7 @@ int runCommand(char **argv){
 
 
 void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string> fileNames, struct windowStats *winStats, bool printTot){
-	
+	uint mostLinks = 0;	
 	int totalBlocks = 0;
 	for(uint i=0; i<filePaths.size(); i++){
 		if( lstat(filePaths[i].c_str(), &statBuff) == -1 ){
@@ -361,7 +363,19 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 			}
 			totalBlocks += ceil(toAdd/1024);
 		}
+		
+		if(mostLinks < statBuff.st_nlink){
+			mostLinks = statBuff.st_nlink;
+		}
+
+
 	}
+	
+	stringstream ss;//convert the largest link count to a string so we can get the number of chars.
+	ss << mostLinks;//
+	mostLinks = ss.str().length();//
+
+	
 
 	if(printTot)	
 		cout << "total " << totalBlocks << endl;
@@ -411,7 +425,10 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 			cout << "x";
 		}else{ cout << "-"; }
 
-		cout << " " << statBuff.st_nlink;
+		
+	
+
+		cout << " " << setw(mostLinks) << statBuff.st_nlink;
 	
 		struct passwd *uID = getpwuid(statBuff.st_uid);
 		struct group *gID = getgrgid(statBuff.st_gid);
