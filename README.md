@@ -49,7 +49,7 @@ Of course, this is only relevent for compound commands. Single commands simply e
 
 ##Building
 
-`git clone https://github.com/npsark/rshell.git'
+`git clone https://github.com/npsark/rshell.git '
 
 `cd rshell`
 
@@ -84,7 +84,7 @@ At this point, *ls* is capable of:
 
 ##Building
 
-`git clone https://github.com/npsark/rshell.git'
+`git clone https://github.com/npsark/rshell.git '
 
 `cd rshell`
 
