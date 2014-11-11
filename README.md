@@ -49,14 +49,15 @@ Of course, this is only relevent for compound commands. Single commands simply e
 
 ##Building
 
+Enter the following commands into *bash*:
+
 git clone https://github.com/npsark/rshell.git
 
 cd rshell
 
 make rshell
 
-After entering these commands in order, the *rshell* program will be stored under the `bin` directory.
-
+After entering these commands, the *ls* program will be stored under the `bin` directory.
 
 
 ##Bugs
@@ -84,13 +85,15 @@ At this point, *ls* is capable of:
 
 ##Building
 
+Enter the following commands into *bash*:
+
 git clone https://github.com/npsark/rshell.git
 
 cd rshell
 
 make ls
 
-After entering these commands in order, the *ls* program will be stored under the `bin` directory.
+After entering these commands, the *ls* program will be stored under the `bin` directory.
 
 ##Bugs
 1. 
