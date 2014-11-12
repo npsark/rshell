@@ -246,7 +246,18 @@ int main(int argc, char **argv){
 				}
 
 				if( S_ISDIR(dirStatBuff.st_mode) ){
-					dirs.push_back(fullFilePath);
+					string fp;
+					uint res = fullFilePath.rfind("/");
+					if(res != string::npos){
+						fp = fullFilePath.substr( res+1 );
+					}else{
+						fp = fullFilePath;
+					}
+					
+					if( fp != "." && fp != ".."){
+						cout << "fp = " << fp << endl;					
+						dirs.push_back(fullFilePath);
+					}
 				}
 
 			}
@@ -259,6 +270,9 @@ int main(int argc, char **argv){
 			}
 		
 			for(uint k=0; k<dirs.size(); k++){
+				//cout << "filePaths = " << filePaths
+				//cout << "dirs[k] = " << dirs[k] << endl;
+
 				if(dirs[k] != "." && dirs[k] != ".."){
 
 					char **args = new char*[4];//build arguments array to pass to execvp via runCommand().
