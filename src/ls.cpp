@@ -264,7 +264,7 @@ int main(int argc, char **argv){
 					char **args = new char*[4];//build arguments array to pass to execvp via runCommand().
 			
 					args[0] = new char[100];//first element will contain the path to this program.
-					strcpy( args[0], "/home/nat/cs100/rshell/bin/ls" );
+					strcpy( args[0], "bin/ls" );
 			
 					string childDir = dirs[k];
 
