@@ -247,8 +247,8 @@ int main(int argc, char **argv){
 
 				if( S_ISDIR(dirStatBuff.st_mode) ){
 					string fp;
-					uint res = fullFilePath.rfind("/");
-					if(res != string::npos){
+					int res = fullFilePath.rfind("/");
+					if(int(res) != int(string::npos)){
 						fp = fullFilePath.substr( res+1 );
 					}else{
 						fp = fullFilePath;
