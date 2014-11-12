@@ -361,7 +361,7 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 			for(int h=0; h<numOfDivs; h++){
 				toAdd *= 10;
 			}
-			totalBlocks += ceil(toAdd/1024);
+			totalBlocks += int(ceil(toAdd/1024));
 		}
 		
 		if(mostLinks < statBuff.st_nlink){
