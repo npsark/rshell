@@ -255,7 +255,6 @@ int main(int argc, char **argv){
 					}
 					
 					if( fp != "." && fp != ".."){
-						cout << "fp = " << fp << endl;					
 						dirs.push_back(fullFilePath);
 					}
 				}
