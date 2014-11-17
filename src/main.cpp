@@ -442,12 +442,7 @@ void parseForCommands(string input){
 
 int runCommand(char **argv, int io, string fileName){
 
-
-
 	int status = 0;
-
-
-
 
 	int pid = fork();
 	if(pid == -1){
@@ -468,7 +463,7 @@ int runCommand(char **argv, int io, string fileName){
 
 
 		if (io == 0){
-			int fd0 = open(fileName.c_str(), O_RDONLY, 0);
+			int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
 			if(fd0 == -1){
 				perror("open");
 			}else{
@@ -480,7 +475,7 @@ int runCommand(char **argv, int io, string fileName){
 				}
 			}
 		}else if (io == 1){
-			int fd1 = creat(fileName.c_str(), 0644);
+			int fd1 = creat(removeEdgeSpaces(fileName).c_str(), 0644);
 			if(fd1 == -1){	
 				perror("creat");
 			}else{
