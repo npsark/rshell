@@ -224,10 +224,99 @@ int parseForRedirection(string input){
 	
 		
 		//parse each bit between pipes(|).
+		uint redirPos;
 		if(inputRedir){
-			success = parseForArgs(toks[0], 0, string(toks[1]));		
+			string cmd = toks[0];
+			string file = "";
+
+			redirPos = input.find("<");
+
+			uint nextNotSpc = input.length()-1;
+
+			for(uint k=redirPos + 1; k<input.length(); k++){
+				if(input[k] != ' '){
+					nextNotSpc = k;
+					break;
+				}
+			}
+
+			uint nextSpc = input.find(" ", nextNotSpc);
+			if( nextSpc < input.length() ){
+				file = input.substr(nextNotSpc, nextSpc-nextNotSpc);
+				
+				if( nextSpc != string::npos ){
+					cmd += input.substr( nextSpc, (input.length() - nextSpc) );
+				}
+
+				success = parseForArgs(cmd, 0, file);
+			}else{
+				success = parseForArgs(toks[0], 0, string(toks[1]));
+			}
+
+			
+
 		}else{
-			success = parseForArgs(toks[0], 1, string(toks[1]));
+			bool append = (input.find(">>") != string::npos);
+			if( append ){
+				redirPos = input.find(">>");
+
+
+				string cmd = toks[0];
+				string file = "";
+
+				uint nextNotSpc = input.length()-1;
+
+				for(uint k=redirPos + 2; k<input.length(); k++){
+					if(input[k] != ' '){
+						nextNotSpc = k;
+						break;
+					}
+				}
+
+				uint nextSpc = input.find(" ", nextNotSpc);
+				if( nextSpc < input.length() ){
+					file = input.substr(nextNotSpc, nextSpc-nextNotSpc);
+				
+					if( nextSpc != string::npos ){
+						cmd += input.substr( nextSpc, (input.length() - nextSpc) );
+					}
+
+					success = parseForArgs(cmd, 2, file);
+				}else{
+					success = parseForArgs(toks[0], 2, string(toks[1]));
+				}
+
+
+
+			}else{
+				redirPos = input.find(">");
+
+
+				string cmd = toks[0];
+				string file = "";
+
+				uint nextNotSpc = input.length()-1;
+
+				for(uint k=redirPos + 2; k<input.length(); k++){
+					if(input[k] != ' '){
+						nextNotSpc = k;
+						break;
+					}
+				}
+
+				uint nextSpc = input.find(" ", nextNotSpc);
+				if( nextSpc < input.length() ){
+					file = input.substr(nextNotSpc, nextSpc-nextNotSpc);
+				
+					if( nextSpc != string::npos ){
+						cmd += input.substr( nextSpc, (input.length() - nextSpc) );
+					}
+
+					success = parseForArgs(cmd, 1, file);
+				}else{
+					success = parseForArgs(toks[0], 1, string(toks[1]));
+				}
+			}
 		}
 
 
@@ -330,39 +419,6 @@ int parseForOR(string input){
 			}
 		}
 
-		//int found = input.find("||");
-		//cout << input.substr(0, found) << endl;
-		//parseForOR(removeEdgeSpaces(input.substr(found + 2, input.length()-found - 2)));
-
-
-
-
-
-		/*char **toks = tokenize(input, "|");
-		i=0;
-
-	
-
-		while(toks[i]){
-
-			success = parseForPipes(toks[i]);
-		
-			if( orStatement ){
-				if(success == 0){
-					return 0;
-				}
-			}
-
-			i++;
-		}
-
-		//clean up
-		i=0;
-		while(toks[i]){
-			delete toks[i];	
-			i++;
-		}
-		delete toks;*/
 	
 	}else{
 
@@ -453,14 +509,6 @@ int runCommand(char **argv, int io, string fileName){
 	}else if(pid == 0){//child
 
 
-		//write to the pipe
-		/*if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
-		      perror("There was an error with dup2. ");
-		}
-		if(-1 == close(fd[0])){//close the read end of the pipe because we're not doing anything with it right now
-		      perror("There was an error with close. ");
-		}*/
-
 
 		if (io == 0){
 			int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
@@ -475,7 +523,19 @@ int runCommand(char **argv, int io, string fileName){
 				}
 			}
 		}else if (io == 1){
-			int fd1 = creat(removeEdgeSpaces(fileName).c_str(), 0644);
+			int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT, 0644);
+			if(fd1 == -1){	
+				perror("creat");
+			}else{
+				if(dup2(fd1, STDOUT_FILENO) == -1){
+					perror("dup2");
+				}
+				if(close(fd1) == -1){
+					perror("close");
+				}
+			}
+		}else if (io == 2){
+			int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 			if(fd1 == -1){	
 				perror("creat");
 			}else{
@@ -499,21 +559,6 @@ int runCommand(char **argv, int io, string fileName){
 		exit(1);
 
 	}else if(pid > 0){//parent
-
-
-
-		//read end of the pipe
-		/*int savestdin;
-		if(-1 == (savestdin = dup(0))){//need to restore later or infinite loop
-		      perror("There is an error with dup. ");
-		}
-		if(-1 == dup2(fd[0],0)){//make stdin the read end of the pipe 
-		      perror("There was an error with dup2. ");
-		}
-		if(-1 == close(fd[1])){//close the write end of the pipe because we're not doing anything with it right now
-		      perror("There was an error with close. ");
-		}*/
-
 
 
 		
