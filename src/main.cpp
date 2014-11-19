@@ -17,22 +17,27 @@ using namespace std;
 char** tokenize(string input, const char *delim);
 int parseForArgs(string input, int io = -1, string fileName = "");
 
-int parseForRedirection(string input);
+int parseForRedirection(string input, bool fromPipe = false);
 int parseForPipes(string input);
 int parseForOR(string input);
 void parseForAND(string input);
 void parseForCommands(string input);
 
 int runCommand(char **argv, int io = -1, string fileName = "");
+int myExec(char **argv, int io, string fileName);
+
 string removeEdgeSpaces(string inString);
 void runPipe(string src, string dest){
+	
+
 	int fd[2];
 	pipe(fd);
 
+
 	int pid = fork();
 
-	if(pid == 0){
 
+	if(pid == 0){
 		//write to the pipe
 		if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
 		      perror("dup2()");
@@ -42,8 +47,9 @@ void runPipe(string src, string dest){
 		      perror("close()");
 		}
 
-		char **toks = tokenize(src, " ");
-		execvp(toks[0], toks);
+		//char **toks = tokenize(src, " ");
+		//execvp(toks[0], toks);
+		parseForRedirection(src);
 		
 		exit(1);
 	}else{
@@ -200,7 +206,7 @@ int parseForArgs(string input, int io, string fileName){
 
 
 
-int parseForRedirection(string input){
+int parseForRedirection(string input, bool fromPipe){
 
 	uint i=0;
 
@@ -226,6 +232,7 @@ int parseForRedirection(string input){
 		//parse each bit between pipes(|).
 		uint redirPos;
 		if(inputRedir){
+
 			string cmd = toks[0];
 			string file = "";
 
@@ -248,9 +255,18 @@ int parseForRedirection(string input){
 					cmd += input.substr( nextSpc, (input.length() - nextSpc) );
 				}
 
-				success = parseForArgs(cmd, 0, file);
+				if(fromPipe){
+					char **cmdToks = tokenize(cmd, " ");
+					success = myExec(cmdToks, 0, file);
+				}else{
+					success = parseForArgs(cmd, 0, file);
+				}
 			}else{
-				success = parseForArgs(toks[0], 0, string(toks[1]));
+				if(fromPipe){
+					success = myExec(toks, 0, string(toks[1]));
+				}else{
+					success = parseForArgs(toks[0], 0, string(toks[1]));
+				}
 			}
 
 			
@@ -362,6 +378,7 @@ int parseForPipes(string input){
 		i=0;
 		
 		while(toks[i]){
+
 			success = parseForRedirection(toks[i]);
 		
 			i++;
@@ -508,9 +525,9 @@ int runCommand(char **argv, int io, string fileName){
 
 	}else if(pid == 0){//child
 
+		myExec(argv, io, fileName);
 
-
-		if (io == 0){
+		/*if (io == 0){
 			int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
 			if(fd0 == -1){
 				perror("open");
@@ -555,7 +572,7 @@ int runCommand(char **argv, int io, string fileName){
 		if(execvp(argv[0], argv) == -1){
 			perror("execvp()");
 		}
-		
+		*/
 		exit(1);
 
 	}else if(pid > 0){//parent
@@ -573,4 +590,58 @@ int runCommand(char **argv, int io, string fileName){
 
 }
 
+
+
+int myExec(char **argv, int io, string fileName){
+
+
+	if (io == 0){
+		int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
+		if(fd0 == -1){
+			perror("open");
+		}else{
+			if(dup2(fd0, STDIN_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd0) == -1){
+				perror("close");
+			}
+		}
+	}else if (io == 1){
+		int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT, 0644);
+		if(fd1 == -1){	
+			perror("open");
+		}else{
+			if(dup2(fd1, STDOUT_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd1) == -1){
+				perror("close");
+			}
+		}
+	}else if (io == 2){
+		int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
+		if(fd1 == -1){	
+			perror("open");
+		}else{
+			if(dup2(fd1, STDOUT_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd1) == -1){
+				perror("close");
+			}
+		}
+	}
+
+
+
+	if(execvp(argv[0], argv) == -1){
+		perror("execvp()");
+		return -1;
+	}
+	
+	return 0;
+
+
+}
 
