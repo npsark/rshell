@@ -232,7 +232,7 @@ int parseForRedirection(string input, bool fromPipe){
 		//parse each bit between pipes(|).
 		uint redirPos;
 		if(inputRedir){
-
+			
 			string cmd = toks[0];
 			string file = "";
 
@@ -250,7 +250,7 @@ int parseForRedirection(string input, bool fromPipe){
 			uint nextSpc = input.find(" ", nextNotSpc);
 			if( nextSpc < input.length() ){
 				file = input.substr(nextNotSpc, nextSpc-nextNotSpc);
-				
+			
 				if( nextSpc != string::npos ){
 					cmd += input.substr( nextSpc, (input.length() - nextSpc) );
 				}
@@ -268,7 +268,6 @@ int parseForRedirection(string input, bool fromPipe){
 					success = parseForArgs(toks[0], 0, string(toks[1]));
 				}
 			}
-
 			
 
 		}else{
@@ -526,58 +525,9 @@ int runCommand(char **argv, int io, string fileName){
 	}else if(pid == 0){//child
 
 		myExec(argv, io, fileName);
-
-		/*if (io == 0){
-			int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
-			if(fd0 == -1){
-				perror("open");
-			}else{
-				if(dup2(fd0, STDIN_FILENO) == -1){
-					perror("dup2");
-				}
-				if(close(fd0) == -1){
-					perror("close");
-				}
-			}
-		}else if (io == 1){
-			int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT, 0644);
-			if(fd1 == -1){	
-				perror("creat");
-			}else{
-				if(dup2(fd1, STDOUT_FILENO) == -1){
-					perror("dup2");
-				}
-				if(close(fd1) == -1){
-					perror("close");
-				}
-			}
-		}else if (io == 2){
-			int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
-			if(fd1 == -1){	
-				perror("creat");
-			}else{
-				if(dup2(fd1, STDOUT_FILENO) == -1){
-					perror("dup2");
-				}
-				if(close(fd1) == -1){
-					perror("close");
-				}
-			}
-		}
-
-
-
-
-
-		if(execvp(argv[0], argv) == -1){
-			perror("execvp()");
-		}
-		*/
 		exit(1);
 
 	}else if(pid > 0){//parent
-
-
 		
 		if(wait(&status) == -1){
 			perror("wait()");
@@ -595,7 +545,7 @@ int runCommand(char **argv, int io, string fileName){
 int myExec(char **argv, int io, string fileName){
 
 
-	if (io == 0){
+	if (io == 0){//input redirection <
 		int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
 		if(fd0 == -1){
 			perror("open");
@@ -607,7 +557,7 @@ int myExec(char **argv, int io, string fileName){
 				perror("close");
 			}
 		}
-	}else if (io == 1){
+	}else if (io == 1){//output redirection >
 		int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT, 0644);
 		if(fd1 == -1){	
 			perror("open");
@@ -619,7 +569,7 @@ int myExec(char **argv, int io, string fileName){
 				perror("close");
 			}
 		}
-	}else if (io == 2){
+	}else if (io == 2){//output redirection >>
 		int fd1 = open(removeEdgeSpaces(fileName).c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
 		if(fd1 == -1){	
 			perror("open");
