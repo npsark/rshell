@@ -15,7 +15,7 @@ using namespace std;
 
 
 char** tokenize(string input, const char *delim);
-int parseForArgs(string input, int io = -1, string fileName = "");
+int parseForArgs(string input, int io = -1, string fileName = "", string otherFile = "");
 
 int parseForRedirection(string input, bool fromPipe = false);
 int parseForPipes(string input);
@@ -23,8 +23,8 @@ int parseForOR(string input);
 void parseForAND(string input);
 void parseForCommands(string input);
 
-int runCommand(char **argv, int io = -1, string fileName = "");
-int myExec(char **argv, int io, string fileName);
+int runCommand(char **argv, int io = -1, string fileName = "", string otherFile = "");
+int myExec(char **argv, int io, string fileName, string otherFile = "");
 
 string removeEdgeSpaces(string inString);
 void runPipe(string src, string dest){
@@ -109,7 +109,7 @@ int main(){
 		}
 
 		//if user inputs "exit" quit the shell
-		if(input == "exit"){
+		if(removeEdgeSpaces(input) == "exit"){
 			exit(1);
 		}	
 
@@ -117,7 +117,7 @@ int main(){
 
 		
 
-	}while(input != "exit");
+	}while(removeEdgeSpaces(input) != "exit");
 	
 	return 0;
 
@@ -170,6 +170,8 @@ char** tokenize(string input, const char *delim){
 		strcpy(tokArr[i], argvVect[i]);
 
 	}
+
+	delete [] input_cstr;
 	
 	return tokArr;
 
@@ -177,13 +179,13 @@ char** tokenize(string input, const char *delim){
 }
 
 
-int parseForArgs(string input, int io, string fileName){
+int parseForArgs(string input, int io, string fileName, string otherFile){
 	
 	
 	//get tokens from input in char* array
 	char **toks = tokenize(input, " ");
 
-	int prg = runCommand(toks, io, removeEdgeSpaces(fileName));	
+	int prg = runCommand(toks, io, removeEdgeSpaces(fileName), otherFile);	
 
 	//clear the toks array
 	uint i=0;
@@ -220,7 +222,6 @@ int parseForRedirection(string input, bool fromPipe){
 
 
 	int success;
-
 
 
 	if(i == 2){		
@@ -334,6 +335,80 @@ int parseForRedirection(string input, bool fromPipe){
 			}
 		}
 
+
+	}else if( i == 3){
+		uint inDir = input.find("<");
+		uint outDir = input.find(">>");
+		bool append = true;
+		if(outDir == string::npos){
+			outDir = input.find(">");
+			append = false;
+		}
+
+
+		if(inDir != string::npos && outDir != string::npos){
+
+			string cmd;
+			if(inDir < outDir){
+				cmd = input.substr(0,inDir);
+			}else{
+				cmd = input.substr(0, outDir);
+			}
+
+			
+			uint firstAlpha;
+			for(firstAlpha=inDir+1; firstAlpha<input.length(); firstAlpha++){
+				if(input[firstAlpha] != ' '){
+					break;
+				}
+			}
+			uint endInFile = input.find(" ", firstAlpha);
+			string inFile = input.substr( firstAlpha, endInFile - firstAlpha);
+
+			cout << "in: " << inFile << endl;
+			
+			int off = 1;
+			if(append){
+				off = 2;
+			}
+			for(firstAlpha=outDir+off; firstAlpha<input.length(); firstAlpha++){
+				if(input[firstAlpha] != ' '){
+					break;
+				}
+			}
+			uint endOutFile = input.find(" ", firstAlpha);
+			string outFile = input.substr( firstAlpha, endOutFile - firstAlpha);
+			
+			cout << "out: " << outFile << endl;
+
+
+			if(inDir < outDir){
+				cmd += input.substr(endInFile, outDir - endInFile);
+				//cmd += " " + input.substr( endOutFile, input.length() - endOutFile-1);
+			}else{
+				cmd += input.substr(endOutFile, inDir - endOutFile);
+				//cmd += " " + input.substr( endInFile, input.length() - endInFile-1);
+			}
+			
+
+			cout << "cmd: " << cmd << endl;
+
+			if(fromPipe){
+				char **cmdToks = tokenize(cmd, " ");
+				if(append){
+					success = myExec(cmdToks, 4, inFile, outFile);
+				}else{
+					success = myExec(cmdToks, 3, inFile, outFile);
+				}
+			}else{
+				if(append){
+					success = parseForArgs(cmd, 4, inFile, outFile);
+				}else{
+					success = parseForArgs(cmd, 3, inFile, outFile);
+				}
+			}	
+
+		}
 
 	}else{
 		success = parseForArgs(toks[0]);
@@ -512,7 +587,7 @@ void parseForCommands(string input){
 }
 
 
-int runCommand(char **argv, int io, string fileName){
+int runCommand(char **argv, int io, string fileName, string otherFile){
 
 	int status = 0;
 
@@ -524,7 +599,7 @@ int runCommand(char **argv, int io, string fileName){
 
 	}else if(pid == 0){//child
 
-		myExec(argv, io, fileName);
+		myExec(argv, io, fileName, otherFile);
 		exit(1);
 
 	}else if(pid > 0){//parent
@@ -542,7 +617,7 @@ int runCommand(char **argv, int io, string fileName){
 
 
 
-int myExec(char **argv, int io, string fileName){
+int myExec(char **argv, int io, string fileName, string otherFile){
 
 
 	if (io == 0){//input redirection <
@@ -581,6 +656,58 @@ int myExec(char **argv, int io, string fileName){
 				perror("close");
 			}
 		}
+	}else if (io == 3){//input and output redirection < infile > outfile
+		int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
+		if(fd0 == -1){
+			perror("open");
+		}else{
+			if(dup2(fd0, STDIN_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd0) == -1){
+				perror("close");
+			}
+		}
+
+		int fd1 = open(removeEdgeSpaces(otherFile).c_str(), O_RDWR | O_CREAT, 0644);
+		if(fd1 == -1){	
+			perror("open");
+		}else{
+			if(dup2(fd1, STDOUT_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd1) == -1){
+				perror("close");
+			}
+		}
+
+
+	}else if (io == 4){//input and output redirection < infile > outfile
+		int fd0 = open(removeEdgeSpaces(fileName).c_str(), O_RDONLY, 0);
+		if(fd0 == -1){
+			perror("open");
+		}else{
+			if(dup2(fd0, STDIN_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd0) == -1){
+				perror("close");
+			}
+		}
+
+		int fd1 = open(removeEdgeSpaces(otherFile).c_str(), O_RDWR | O_CREAT | O_APPEND, 0644);
+		if(fd1 == -1){	
+			perror("open");
+		}else{
+			if(dup2(fd1, STDOUT_FILENO) == -1){
+				perror("dup2");
+			}
+			if(close(fd1) == -1){
+				perror("close");
+			}
+		}
+
+
 	}
 
 
