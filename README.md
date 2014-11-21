@@ -93,7 +93,7 @@ After entering these commands, the *rshell* program will be stored under the `bi
 4. *rshell* does not process commands that have both && and || unless they are separated by semicolons. If it does come across this, it treats the && as ||. For example, `echo a || echo b && echo c` will be parsed as `echo a || echo b || echo c`.
 5. *rshell* does not parse tabs correctly. For example, assuming 'T' represents a tab, `echo TTT"hello world"` would throw an error saying it can't find the directory.
 6. If *rshell* encounters more than one output redirection symbol within a single command, it chrashes. If the command is a compound command separated by semicolons, any of the commands between semicolons can have output redirection regardless of whether the others do.
-7. If a command redirects it output to a file and then attempts to pipe its output to another command, *rshell* will crash (ex. `cat Makefile >file | grep g++`).
+7. If a command redirects its output to a file and then attempts to pipe its output to another command, *rshell* will crash (ex. `cat Makefile >file | grep g++`).
 
 
 #LS
