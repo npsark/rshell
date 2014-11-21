@@ -70,6 +70,8 @@ IO redirection is done using the '<', '>', and '>>' symbols.
 
 These can be mixed and matched in reasonable ways. Specifically, '>' and '>>' should not appear in the same command. `cat Makefile >file1 >>file2` would cause an error because *rshell* does not know where to send the output. However, '>' and '>>' can always appear in a command that contains '<' because rshell knows that one is redirecting output while the other is redirecting input.
 
+The location of the input and output redirections in a command relative to the other arguments of the command does not matter.
+`grep <Makefile -o g++` is the same as `grep g++ -o <Makefile`.
 
 ##Building
 
@@ -88,8 +90,10 @@ After entering these commands, the *rshell* program will be stored under the `bi
 1. When text is being entered into *rshell*, it does not account for the quotes. As a result, something like `echo "Hello World"` will print, `"Hello World"` rather than the expected `Hello World`.
 2. *rshell* cannot process commands when there are not spaces betweent the command and the parameters or between the parameters. However, it can process commands in which the parameters have been "pushed" together. For example, `top -i -c` is considered the same as `top -ic` while `top-i-c`, `top -i-c`, and `top-i -c` will all cause *rshell* to fail.
 3. *rshell* does not recognize `Ctrl` commands. For example, in *bash* `Ctrl+c` will exit the current process immediately. *rshell* will not understand that command.
-4. *rshell* does not process commands that have both && and || unless they are separated by semicolons. If it does come across this, it treats the && as ||. FOr example, `echo a || echo b && echo c` will be parsed as `echo a || echo b || echo c`.
+4. *rshell* does not process commands that have both && and || unless they are separated by semicolons. If it does come across this, it treats the && as ||. For example, `echo a || echo b && echo c` will be parsed as `echo a || echo b || echo c`.
 5. *rshell* does not parse tabs correctly. For example, assuming 'T' represents a tab, `echo TTT"hello world"` would throw an error saying it can't find the directory.
+6. If *rshell* encounters more than one output redirection symbol within a single command, it chrashes. If the command is a compound command separated by semicolons, any of the commands between semicolons can have output redirection regardless of whether the others do.
+7. If a command redirects it output to a file and then attempts to pipe its output to another command, *rshell* will crash (ex. `cat Makefile >file | grep g++`).
 
 
 #LS
