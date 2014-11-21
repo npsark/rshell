@@ -11,6 +11,10 @@ At this point, rshell is capable of:
 * processing comments after the pound sign(#).
 * exiting when `exit` is entered at the prompt.
 * displaying the user's login and host name at the prompt.
+* piping the out put of a command into the input of another.
+* redirecting the input and output of a command from and to any files.
+
+###Logic Operators
 
 The hierarchy of the logical operators and semicolons is such that, the input is first separated by semicolons and then the resulting compound or simple commands are separated by && and ||.
 
@@ -45,6 +49,27 @@ C
 At this point, *rshell* checks to see if there is an OR operator(||) in the input. If there is, it processes the command such that, it stops executing once it succesfully executes one of the comands separated by the OR operator. If there is no OR operator, it processes the input such that, it only executes the next command if the last one was successful.
 
 Of course, this is only relevent for compound commands. Single commands simply execute and succeed or fail.
+
+###Piping
+
+Piping is done by appending the '|' character in between two commands. For example:
+
+`cat Makefile | grep g++`
+
+The output of `cat`, which is the contents of `Makefile` is passed to `grep` as input. `grep` then searches the input for `g++` and outputs its results to the screen.
+
+Pipes can be chained indefinitely. `cat Makefile | grep g++ | grep main.cpp` executes `cat`, passes the output to `grep`, which in turn passes its output to the next `grep`, which finally outputs to `stdout`.
+
+###Input & Output Redirection
+
+IO redirection is done using the '<', '>', and '>>' symbols.
+
+`cat < Makefile` tells `cat` to get its input from `Makefile`.
+`cat Makefile > Makefile_cpy` tells `cat` to send it output to `Makefile_cpy`.
+`cat README.md >> Makefile_cpy` tells `cat` to append its output to `Makefile_cpy`.
+
+These can be mixed and matched in reasonable ways. Specifically, '>' and '>>' should not appear in the same command. `cat Makefile >file1 >>file2` would cause an error because *rshell* does not know where to send the output. However, '>' and '>>' can always appear in a command that contains '<' because rshell knows that one is redirecting output while the other is redirecting input.
+
 
 ##Building
 
