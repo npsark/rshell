@@ -1,4 +1,6 @@
 #include <iostream>
+#include <sstream>
+
 #include <string>
 #include <cstring>
 #include <vector>
@@ -27,65 +29,12 @@ int runCommand(char **argv, int io = -1, string fileName = "", string otherFile 
 int myExec(char **argv, int io, string fileName, string otherFile = "");
 
 string removeEdgeSpaces(string inString);
-void runPipe(string src, string dest){
-	
+void runPipe(string src, string dest);
 
-	int fd[2];
-	pipe(fd);
+void childSig(int sig);
+void parentSig(int sig);
 
-
-	int pid = fork();
-
-
-	if(pid == 0){
-		//write to the pipe
-		if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
-		      perror("dup2()");
-		}
-
-		if(-1 == close(fd[0])){//close the read end of the pipe because we're not doing anything with it right now
-		      perror("close()");
-		}
-
-		//char **toks = tokenize(src, " ");
-		//execvp(toks[0], toks);
-		parseForRedirection(src);
-		
-		exit(1);
-	}else{
-		wait(NULL);
-
-		//read end of the pipe
-		int savestdin;
-		if(-1 == (savestdin = dup(0))){//need to restore later or infinite loop
-		      perror("dup()");
-		}
-		if(-1 == dup2(fd[0],0)){//make stdin the read end of the pipe 
-		      perror("dup2()");
-		}
-		if(-1 == close(fd[1])){//close the write end of the pipe because we're not doing anything with it right now
-		      perror("close()");
-		}
-
-		parseForPipes(removeEdgeSpaces(dest));
-
-		dup2(savestdin,0);
-
-	}
-
-	//parseForRedirection(src);
-	//parseForPipes(dest);
-
-
-}
-
-
-
-int main(){
-
-
-
-
+void prompt(){
 	char *hostname = new char[50];
 	if(gethostname(hostname, 50) == -1){
 		perror("gethostname() failed");
@@ -95,33 +44,73 @@ int main(){
 		perror("getlogin() failed");
 	}
 	
+	
+	
+	cout << login << "@" << hostname <<"$ ";
+
+
+	string input;
+
+	//get user input and store as string and cstring
+	getline(cin, input);	
+
+
+	cout << "yolo" << endl;
+
+	if(input.find("#") != string::npos){
+		input.resize(input.find("#"));
+	}
+
+	//if user inputs "exit" quit the shell
+	if(removeEdgeSpaces(input) == "exit"){
+		exit(1);
+	}	
+
+	parseForCommands(input);
+
+}
+
+bool interrupt = false;
+
+int main(){
+
+
+
+	signal(SIGINT, parentSig);
 
 	string input;
 	do{
 		//display prompt
-		cout << login << "@" << hostname <<"$ ";
+		prompt();
 
-		//get user input and store as string and cstring
-		getline(cin, input);
+
 		
-		if(input.find("#") != string::npos){
-			input.resize(input.find("#"));
-		}
-
-		//if user inputs "exit" quit the shell
-		if(removeEdgeSpaces(input) == "exit"){
-			exit(1);
-		}	
-
-		parseForCommands(input);
 
 		
 
 	}while(removeEdgeSpaces(input) != "exit");
 	
+
+
 	return 0;
 
 }
+
+
+
+
+
+void parentSig(int sig){
+	if(sig == SIGINT){
+		interrupt = true;
+		//cin.close();
+		cout << endl;
+		prompt();
+	}
+}
+
+
+
 
 
 string removeEdgeSpaces(string inString){
@@ -516,6 +505,9 @@ int parseForOR(string input){
 		success = parseForPipes(input);		
 
 	}
+
+	
+
 	
 	return success;
 
@@ -587,6 +579,11 @@ void parseForCommands(string input){
 }
 
 
+
+
+
+
+
 int runCommand(char **argv, int io, string fileName, string otherFile){
 
 	int status = 0;
@@ -598,7 +595,7 @@ int runCommand(char **argv, int io, string fileName, string otherFile){
 		exit(1);
 
 	}else if(pid == 0){//child
-
+		
 		myExec(argv, io, fileName, otherFile);
 		exit(1);
 
@@ -710,14 +707,83 @@ int myExec(char **argv, int io, string fileName, string otherFile){
 
 	}
 
+	string PATH = getenv("PATH");
 
+	string cmd = string(argv[0]);
 
-	if(execvp(argv[0], argv) == -1){
-		perror("execvp()");
+	char **pathToks = tokenize(PATH, ":");
+	
+	bool ran = false;
+
+	for(int i=0; pathToks[i]; i++){
+		string path = string(pathToks[i]) + "/" + cmd;
+
+		delete [] argv[0];
+		argv[0] = new char[path.length() + 1];
+		strcpy( argv[0], path.c_str() );
+
+		if( execv(argv[0], argv) == -1){
+			//return -1;
+		}else{
+			ran = true;
+			break;
+		}
+
+	}
+
+	if(!ran){
+		perror("execv()");
 		return -1;
 	}
 	
 	return 0;
+
+
+}
+
+void runPipe(string src, string dest){
+	
+
+	int fd[2];
+	pipe(fd);
+
+
+	int pid = fork();
+
+
+	if(pid == 0){
+		//write to the pipe
+		if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
+		      perror("dup2()");
+		}
+
+		if(-1 == close(fd[0])){//close the read end of the pipe because we're not doing anything with it right now
+		      perror("close()");
+		}
+
+		parseForRedirection(src);
+		
+		exit(1);
+	}else{
+		wait(NULL);
+
+		//read end of the pipe
+		int savestdin;
+		if(-1 == (savestdin = dup(0))){//need to restore later or infinite loop
+		      perror("dup()");
+		}
+		if(-1 == dup2(fd[0],0)){//make stdin the read end of the pipe 
+		      perror("dup2()");
+		}
+		if(-1 == close(fd[1])){//close the write end of the pipe because we're not doing anything with it right now
+		      perror("close()");
+		}
+
+		parseForPipes(removeEdgeSpaces(dest));
+
+		dup2(savestdin,0);
+
+	}
 
 
 }
