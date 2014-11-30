@@ -14,7 +14,7 @@
 #include <signal.h>
 using namespace std;
 
-
+int child=-1;
 
 char** tokenize(string input, const char *delim);
 int parseForArgs(string input, int io = -1, string fileName = "", string otherFile = "");
@@ -44,29 +44,10 @@ void prompt(){
 		perror("getlogin() failed");
 	}
 	
-	
-	
+
+	cin.clear();
 	cout << login << "@" << hostname <<"$ ";
 
-
-	string input;
-
-	//get user input and store as string and cstring
-	getline(cin, input);	
-
-
-	cout << "yolo" << endl;
-
-	if(input.find("#") != string::npos){
-		input.resize(input.find("#"));
-	}
-
-	//if user inputs "exit" quit the shell
-	if(removeEdgeSpaces(input) == "exit"){
-		exit(1);
-	}	
-
-	parseForCommands(input);
 
 }
 
@@ -82,8 +63,25 @@ int main(){
 	do{
 		//display prompt
 		prompt();
+	
+		string input;
+
+		//get user input and store as string and cstring
+		getline(cin, input);	
 
 
+		cout << "yolo" << endl;
+
+		if(input.find("#") != string::npos){
+			input.resize(input.find("#"));
+		}
+
+		//if user inputs "exit" quit the shell
+		if(removeEdgeSpaces(input) == "exit"){
+			exit(1);
+		}	
+
+		parseForCommands(input);
 		
 
 		
@@ -102,10 +100,26 @@ int main(){
 
 void parentSig(int sig){
 	if(sig == SIGINT){
-		interrupt = true;
-		//cin.close();
 		cout << endl;
+
+		interrupt = true;
+
 		prompt();
+
+		//cout << "child: " << child << endl;
+		/*cout << "good: " << cin.good() << endl;
+		cout << "eof: " << cin.eof() << endl;
+		cout << "fail: " << cin.fail() << endl;
+		cout << "bad: " << cin.bad() << endl;*/
+	
+		if(child != -1){
+			kill(child, SIGKILL);
+			child = -1;
+		}else{
+			//cout << endl;
+			
+		}
+
 	}
 }
 
@@ -601,6 +615,8 @@ int runCommand(char **argv, int io, string fileName, string otherFile){
 
 	}else if(pid > 0){//parent
 		
+		child = pid;
+
 		if(wait(&status) == -1){
 			perror("wait()");
 		}
@@ -765,6 +781,8 @@ void runPipe(string src, string dest){
 		
 		exit(1);
 	}else{
+		child = pid;
+
 		wait(NULL);
 
 		//read end of the pipe
