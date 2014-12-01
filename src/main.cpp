@@ -135,6 +135,7 @@ void parentSig(int sig){
 	if(sig == SIGINT){
 	
 		if(child != -1){
+			cout << "killing " << child << endl;
 			kill(child, SIGKILL);
 			child = -1;
 			cout << endl;
@@ -634,18 +635,22 @@ int runCommand(char **argv, int io, string fileName, string otherFile){
 
 	}else if(pid == 0){//child
 		
+		//setpgid(pid, 0);
 		myExec(argv, io, fileName, otherFile);
 		exit(1);
 
 	}else if(pid > 0){//parent
 		
 		child = pid;
+		signal(SIGINT, SIG_IGN);
 
 		if(wait(&status) == -1){
 			perror("wait()");
 		}
 
 		child = -1;
+		signal(SIGINT, parentSig);
+
 
 	}
 
@@ -814,6 +819,8 @@ void runPipe(string src, string dest){
 
 
 	if(pid == 0){
+		setpgid(pid, 0);
+
 		//write to the pipe
 		if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
 		      perror("dup2()");
