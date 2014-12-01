@@ -1,9 +1,10 @@
 #include <iostream>
 #include <sstream>
-
+#include <map>
 #include <string>
-#include <cstring>
 #include <vector>
+
+#include <string.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,6 +35,9 @@ void runPipe(string src, string dest);
 void childSig(int sig);
 void parentSig(int sig);
 
+void myExit(void* arg = NULL);
+void cd(void* newPath);
+
 void prompt(){
 	char *hostname = new char[50];
 	if(gethostname(hostname, 50) == -1){
@@ -43,18 +47,27 @@ void prompt(){
 	if(login == NULL){
 		perror("getlogin() failed");
 	}
-	
+	char cwd[1024];
+	if( getcwd(cwd, sizeof(cwd)) == NULL ){
+		perror("getlogin() failed");
+	}
 
 	cin.clear();
-	cout << login << "@" << hostname <<"$ ";
+	cout << login << "@" << hostname << ":" << cwd << "$ ";
 
 
 }
 
-bool interrupt = false;
+
+
 
 int main(){
 
+	map<string, void (*)(void*)> commands;
+	map<string, void (*)(void*)>::iterator it;
+
+	commands["cd"] = cd;
+	commands["exit"] = myExit;
 
 
 	signal(SIGINT, parentSig);
@@ -69,20 +82,29 @@ int main(){
 		//get user input and store as string and cstring
 		getline(cin, input);	
 
-
-		cout << "yolo" << endl;
-
 		if(input.find("#") != string::npos){
 			input.resize(input.find("#"));
 		}
 
-		//if user inputs "exit" quit the shell
-		if(removeEdgeSpaces(input) == "exit"){
-			exit(1);
-		}	
 
-		parseForCommands(input);
-		
+		input = removeEdgeSpaces(input);
+		int firstSpc = input.find(" ");
+		string cmd = input.substr(0, firstSpc);
+
+
+		it = commands.find(cmd);
+		if( it != commands.end() ){
+			if(cmd == "exit"){
+				commands.at(cmd)(NULL);
+			}else if(cmd == "cd"){
+				string nDir = input.substr(firstSpc, input.length()-firstSpc);
+				nDir = removeEdgeSpaces(nDir);
+				commands.at(cmd)(&nDir);
+			}
+			
+		}else{			
+			parseForCommands(input);
+		}
 
 		
 
@@ -95,29 +117,31 @@ int main(){
 }
 
 
+void myExit(void* arg){
+	exit(1);
+}
+
+void cd(void* newPath){
+	string nPath = *((string*)newPath);
+
+	if(chdir(nPath.c_str()) == -1){
+		perror("chdir");
+	}
+}
 
 
 
 void parentSig(int sig){
 	if(sig == SIGINT){
-		cout << endl;
-
-		interrupt = true;
-
-		prompt();
-
-		//cout << "child: " << child << endl;
-		/*cout << "good: " << cin.good() << endl;
-		cout << "eof: " << cin.eof() << endl;
-		cout << "fail: " << cin.fail() << endl;
-		cout << "bad: " << cin.bad() << endl;*/
 	
 		if(child != -1){
 			kill(child, SIGKILL);
 			child = -1;
+			cout << endl;
 		}else{
-			//cout << endl;
-			
+			cout << endl;
+			prompt();
+			cout.flush();
 		}
 
 	}
@@ -621,6 +645,8 @@ int runCommand(char **argv, int io, string fileName, string otherFile){
 			perror("wait()");
 		}
 
+		child = -1;
+
 	}
 
 	
@@ -747,6 +773,26 @@ int myExec(char **argv, int io, string fileName, string otherFile){
 
 	}
 
+
+	if(!ran){
+
+		delete [] argv[0];
+		argv[0] = new char[3];
+
+		string thisPath = "./" + cmd;
+
+		strcpy( argv[0], thisPath.c_str() );
+
+	
+		if( execv(argv[0], argv) == -1){
+		}else{
+			ran = true;
+		}
+	}
+
+	
+
+
 	if(!ran){
 		perror("execv()");
 		return -1;
@@ -784,6 +830,8 @@ void runPipe(string src, string dest){
 		child = pid;
 
 		wait(NULL);
+
+		child = -1;
 
 		//read end of the pipe
 		int savestdin;
