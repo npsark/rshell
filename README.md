@@ -12,7 +12,9 @@ At this point, rshell is capable of:
 * exiting when `exit` is entered at the prompt.
 * displaying the user's login and host name at the prompt.
 * piping the out put of a command into the input of another.
-* redirecting the input and output of a command from and to any files.
+* redirecting the input and output of a command from and to any file.
+* ignoring the interrupt signal unless a child process is running.
+* changing the current working directory by means of the `cd` command.
 
 ###Logic Operators
 
@@ -52,7 +54,7 @@ Of course, this is only relevent for compound commands. Single commands simply e
 
 ###Piping
 
-Piping is done by appending the '|' character in between two commands. For example:
+Piping is done by inserting the '|' character in between two commands. For example:
 
 `cat Makefile | grep g++`
 
