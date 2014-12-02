@@ -35,11 +35,11 @@ void runPipe(string src, string dest);
 void childSig(int sig);
 void parentSig(int sig);
 
-void myExit(void* arg = NULL);
-void cd(void* newPath);
+int myExit(void* arg = NULL);
+int cd(void* newPath);
 
 void prompt(){
-	char *hostname = new char[50];
+	char hostname[50];
 	if(gethostname(hostname, 50) == -1){
 		perror("gethostname() failed");
 	}
@@ -55,22 +55,17 @@ void prompt(){
 	cin.clear();
 	cout << login << "@" << hostname << ":" << cwd << "$ ";
 
-
+	delete [] login;
 }
-
-
 
 
 int main(){
 
-	map<string, void (*)(void*)> commands;
-	map<string, void (*)(void*)>::iterator it;
-
-	commands["cd"] = cd;
-	commands["exit"] = myExit;
 
 
-	signal(SIGINT, parentSig);
+	if( signal(SIGINT, parentSig) == SIG_ERR ){
+		perror("signal()");
+	}
 
 	string input;
 	do{
@@ -87,24 +82,8 @@ int main(){
 		}
 
 
-		input = removeEdgeSpaces(input);
-		int firstSpc = input.find(" ");
-		string cmd = input.substr(0, firstSpc);
 
-
-		it = commands.find(cmd);
-		if( it != commands.end() ){
-			if(cmd == "exit"){
-				commands.at(cmd)(NULL);
-			}else if(cmd == "cd"){
-				string nDir = input.substr(firstSpc, input.length()-firstSpc);
-				nDir = removeEdgeSpaces(nDir);
-				commands.at(cmd)(&nDir);
-			}
-			
-		}else{			
-			parseForCommands(input);
-		}
+		parseForCommands(input);
 
 		
 
@@ -117,16 +96,20 @@ int main(){
 }
 
 
-void myExit(void* arg){
+int myExit(void* arg){
 	exit(1);
+	return 0;
 }
 
-void cd(void* newPath){
+int cd(void* newPath){
 	string nPath = *((string*)newPath);
 
 	if(chdir(nPath.c_str()) == -1){
 		perror("chdir");
+		return 1;
 	}
+
+	return 0;
 }
 
 
@@ -209,26 +192,49 @@ char** tokenize(string input, const char *delim){
 
 int parseForArgs(string input, int io, string fileName, string otherFile){
 	
+	int success = 0;
+
+
+	map<string, int (*)(void*)> commands;
+	map<string, int (*)(void*)>::iterator it;
+		commands["cd"] = cd;
+		commands["exit"] = myExit;
 	
-	//get tokens from input in char* array
-	char **toks = tokenize(input, " ");
+	input = removeEdgeSpaces(input);
+	int firstSpc = input.find(" ");
+	string cmd = input.substr(0, firstSpc);	
 
-	int prg = runCommand(toks, io, removeEdgeSpaces(fileName), otherFile);	
+	it = commands.find(cmd);
+	if( it != commands.end() ){
+		if(cmd == "exit"){
+			success = commands.at(cmd)(NULL);
+		}else if(cmd == "cd"){
+			string nDir = input.substr(firstSpc, input.length()-firstSpc);
+			nDir = removeEdgeSpaces(nDir);
+			success = commands.at(cmd)(&nDir);
+		}
+		
+	}else{		
 
-	//clear the toks array
-	uint i=0;
-	while(toks[i]){
-		delete toks[i];
-		i++;
+		//get tokens from input in char* array
+		char **toks = tokenize(input, " ");
+
+		success = runCommand(toks, io, removeEdgeSpaces(fileName), otherFile);	
+
+		//clear the toks array
+		uint i=0;
+		while(toks[i]){
+			delete [] toks[i];
+			i++;
+		}
+
+		//delete toks
+		delete [] toks;
+
 	}
-
-	//delete toks
-	delete toks;
-
-	
 	
 
-	return prg;
+	return success;
 
 }
 
@@ -444,10 +450,10 @@ int parseForRedirection(string input, bool fromPipe){
 
 	i=0;
 	while(toks[i]){
-		delete toks[i];	
+		delete [] toks[i];	
 		i++;
 	}
-	delete toks;
+	delete [] toks;
 	return success;
 
 }
@@ -492,10 +498,10 @@ int parseForPipes(string input){
 	//clean up
 	i=0;
 	while(toks[i]){
-		delete toks[i];	
+		delete [] toks[i];	
 		i++;
 	}
-	delete toks;
+	delete [] toks;
 	return success;
 
 }
@@ -588,10 +594,10 @@ void parseForAND(string input){
 	//clean up
 	i=0;
 	while(toks[i]){
-		delete toks[i];	
+		delete [] toks[i];	
 		i++;
 	}
-	delete toks;
+	delete [] toks;
 
 }
 
@@ -605,15 +611,15 @@ void parseForCommands(string input){
 		parseForAND(toks[i]);	
 		i++;
 	}
-	
+
 
 	//clean up
 	i=0;
 	while(toks[i]){
-		delete toks[i];	
+		delete [] toks[i];	
 		i++;
 	}
-	delete toks;
+	delete [] toks;
 	
 }
 
@@ -642,14 +648,18 @@ int runCommand(char **argv, int io, string fileName, string otherFile){
 	}else if(pid > 0){//parent
 		
 		child = pid;
-		signal(SIGINT, SIG_IGN);
+		if( signal(SIGINT, SIG_IGN) == SIG_ERR ){
+			perror("signal()");
+		}
 
 		if(wait(&status) == -1){
 			perror("wait()");
 		}
 
 		child = -1;
-		signal(SIGINT, parentSig);
+		if( signal(SIGINT, parentSig) == SIG_ERR ){
+			perror("signal()");
+		}
 
 
 	}
@@ -759,11 +769,20 @@ int myExec(char **argv, int io, string fileName, string otherFile){
 	string cmd = string(argv[0]);
 
 	char **pathToks = tokenize(PATH, ":");
-	
+
+	vector<string> paths;
+	int i=0;
+	while(pathToks[i]){
+		paths.push_back(string(pathToks[i]));
+		i++;
+	}
+
+	paths.push_back( "." );
+
 	bool ran = false;
 
-	for(int i=0; pathToks[i]; i++){
-		string path = string(pathToks[i]) + "/" + cmd;
+	for(uint i=0; i < paths.size(); i++){
+		string path = string(paths[i]) + "/" + cmd;
 
 		delete [] argv[0];
 		argv[0] = new char[path.length() + 1];
@@ -777,24 +796,6 @@ int myExec(char **argv, int io, string fileName, string otherFile){
 		}
 
 	}
-
-
-	if(!ran){
-
-		delete [] argv[0];
-		argv[0] = new char[3];
-
-		string thisPath = "./" + cmd;
-
-		strcpy( argv[0], thisPath.c_str() );
-
-	
-		if( execv(argv[0], argv) == -1){
-		}else{
-			ran = true;
-		}
-	}
-
 	
 
 
@@ -812,14 +813,19 @@ void runPipe(string src, string dest){
 	
 
 	int fd[2];
-	pipe(fd);
+	if( pipe(fd) == -1){
+		perror("pipe()");
+		exit(1);
+	}
 
 
 	int pid = fork();
 
 
-	if(pid == 0){
-		setpgid(pid, 0);
+	if(pid == -1){
+		perror("fork()");
+		exit(1);
+	}else if(pid == 0){
 
 		//write to the pipe
 		if(-1 == dup2(fd[1],1)){//make stdout the write end of the pipe 
@@ -833,12 +839,21 @@ void runPipe(string src, string dest){
 		parseForRedirection(src);
 		
 		exit(1);
-	}else{
+	}else if(pid > 0){
 		child = pid;
+		if( signal(SIGINT, SIG_IGN) == SIG_ERR ){
+			perror("signal()");
+		}
 
-		wait(NULL);
+		if( wait(NULL) == -1){
+			perror("wait()");
+			exit(1);
+		}
 
 		child = -1;
+		if( signal(SIGINT, parentSig) == SIG_ERR ){
+			perror("signal()");
+		}
 
 		//read end of the pipe
 		int savestdin;
@@ -854,7 +869,10 @@ void runPipe(string src, string dest){
 
 		parseForPipes(removeEdgeSpaces(dest));
 
-		dup2(savestdin,0);
+		if( dup2(savestdin,0) == -1){
+			perror("dup2");
+			exit(1);
+		}
 
 	}
 
