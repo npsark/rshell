@@ -66,19 +66,19 @@ rick
 ```
 This is really basic but poses a pretty big issue. As soon as you start dealing with a list any larger than ten or so elements, the output is going to be rediculously long. That brings us to columns.
 
-Printing a sorted list into columns turns out to be a bit more complicated than it may seem at first. We've got a few things to consider. First of all, do we want the output to ascend accross the columns or down the columns?
+Printing a sorted list into columns turns out to be a bit more complicated than it may seem at first. We've got a few things to consider. First of all, do we want the output to ascend accross the columns or down the columns? Let's go back to numbers for clarity's sake.
 
 Example: ascending accross columns:
 ```
-bob carl dave
-ed james joe
-rick steve zeus
+0 1 2
+3 4 5
+6 7 8
 ```
 Example: ascending down columns:
 ```
-bob ed rick
-carl james steve
-dave joe zeus
+0 3 6
+1 4 7
+2 5 8
 ```
 Printing out a list ascending accross columns is really simple if you know how many columns you want. We'll learn how to calculate the number of columns later. Assuming you want three columns, you just print three element at a time on each line. This works pretty well, but there is still an issue that causes the columns to not line up. We'll get to that later.
 
