@@ -14,7 +14,7 @@ At this point, rshell is capable of:
 * piping the out put of a command into the input of another.
 * redirecting the input and output of a command from and to any file.
 * ignoring the interrupt signal unless a child process is running.
-* changing the current working directory by means of the `cd` command. Only one path is considered among the arguments. If more than one is given, one the first is used.
+* changing the current working directory by means of the `cd` command. Only one path is considered among the arguments. If more than one is given, only the first is used.
 * manually searching for programs in each path listed in the PATH environment variable.
 
 ###Logic Operators
