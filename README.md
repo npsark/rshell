@@ -14,7 +14,8 @@ At this point, rshell is capable of:
 * piping the out put of a command into the input of another.
 * redirecting the input and output of a command from and to any file.
 * ignoring the interrupt signal unless a child process is running.
-* changing the current working directory by means of the `cd` command.
+* changing the current working directory by means of the `cd` command. Only one path is considered among the arguments. If more than one is given, one the first is used.
+* manually searching for programs in each path listed in the PATH environment variable.
 
 ###Logic Operators
 
@@ -87,7 +88,41 @@ Enter the following commands into *bash*:
 
 After entering these commands, the *rshell* program will be stored under the `bin` directory.
 
-
+##Valgrind test
+```
+nat@Nat-Debian:~/cs100/rshell$ valgrind bin/rshell
+==4241== Memcheck, a memory error detector
+==4241== Copyright (C) 2002-2011, and GNU GPL'd, by Julian Seward et al.
+==4241== Using Valgrind-3.7.0 and LibVEX; rerun with -h for copyright info
+==4241== Command: bin/rshell
+==4241== 
+nat@Nat-Debian:/home/nat/cs100/rshell$ ls
+bin  hw4.md  LICENSE  Makefile	README.md  src	tests
+nat@Nat-Debian:/home/nat/cs100/rshell$ cd /home
+nat@Nat-Debian:/home$ ls
+nat
+nat@Nat-Debian:/home$ exit
+==4241== 
+==4241== HEAP SUMMARY:
+==4241==     in use at exit: 410 bytes in 18 blocks
+==4241==   total heap usage: 201 allocs, 183 frees, 13,152 bytes allocated
+==4241== 
+==4241== LEAK SUMMARY:
+==4241==    definitely lost: 0 bytes in 0 blocks
+==4241==    indirectly lost: 0 bytes in 0 blocks
+==4241==      possibly lost: 230 bytes in 8 blocks
+==4241==    still reachable: 180 bytes in 10 blocks
+==4241==         suppressed: 0 bytes in 0 blocks
+==4241== Rerun with --leak-check=full to see details of leaked memory
+==4241== 
+==4241== For counts of detected and suppressed errors, rerun with: -v
+==4241== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 4 from 4)
+```
+##CPPCheck
+```
+nat@Nat-Debian:~/cs100/rshell$ cppcheck src/main.cpp 
+Checking src/main.cpp...
+```
 ##Bugs
 1. When text is being entered into *rshell*, it does not account for the quotes. As a result, something like `echo "Hello World"` will print, `"Hello World"` rather than the expected `Hello World`.
 2. *rshell* cannot process commands when there are not spaces betweent the command and the parameters or between the parameters. However, it can process commands in which the parameters have been "pushed" together. For example, `top -i -c` is considered the same as `top -ic` while `top-i-c`, `top -i-c`, and `top-i -c` will all cause *rshell* to fail.
@@ -96,6 +131,7 @@ After entering these commands, the *rshell* program will be stored under the `bi
 5. *rshell* does not parse tabs correctly. For example, assuming 'T' represents a tab, `echo TTT"hello world"` would throw an error saying it can't find the directory.
 6. If *rshell* encounters more than one output redirection symbol within a single command, it chrashes. If the command is a compound command separated by semicolons, any of the commands between semicolons can have output redirection regardless of whether the others do.
 7. If a command redirects its output to a file and then attempts to pipe its output to another command, *rshell* will crash (ex. `cat Makefile >file | grep g++`).
+8. If a program is running within *rshell* and ^c is enterred, it does not kill the child process. Instead, it send the interrup signal. As a result, if the child process handles interrupt signals unusually, the child's handling is executed.
 
 
 #LS
