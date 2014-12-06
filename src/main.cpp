@@ -39,8 +39,8 @@ int myExit(void* arg = NULL);
 int cd(void* newPath);
 
 void prompt(){
-	char hostname[50];
-	if(gethostname(hostname, 50) == -1){
+	char hostname[1024];
+	if(gethostname(hostname, 1024) == -1){
 		perror("gethostname() failed");
 	}
 	char *login = getlogin();
@@ -55,7 +55,7 @@ void prompt(){
 	cin.clear();
 	cout << login << "@" << hostname << ":" << cwd << "$ ";
 
-	delete [] login;
+	//delete [] login;
 }
 
 
@@ -117,16 +117,16 @@ int cd(void* newPath){
 void parentSig(int sig){
 	if(sig == SIGINT){
 	
-		if(child != -1){
+		/*if(child != -1){
 			cout << "killing " << child << endl;
 			kill(child, SIGKILL);
 			child = -1;
 			cout << endl;
-		}else{
-			cout << endl;
-			prompt();
-			cout.flush();
-		}
+		}else{*/
+		cout << endl;
+		prompt();
+		cout.flush();
+		//}
 
 	}
 }
@@ -209,8 +209,14 @@ int parseForArgs(string input, int io, string fileName, string otherFile){
 		if(cmd == "exit"){
 			success = commands.at(cmd)(NULL);
 		}else if(cmd == "cd"){
-			string nDir = input.substr(firstSpc, input.length()-firstSpc);
+			string nDir;
+			if(firstSpc != -1){
+				nDir = input.substr(firstSpc, input.length()-firstSpc);
+			}else{
+				nDir = " ";
+			}
 			nDir = removeEdgeSpaces(nDir);
+			
 			success = commands.at(cmd)(&nDir);
 		}
 		
