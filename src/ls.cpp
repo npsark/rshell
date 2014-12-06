@@ -444,17 +444,19 @@ void outputFlag_L(struct stat statBuff, vector<string> filePaths, vector<string>
 		cout << " " << setw(mostLinks) << statBuff.st_nlink;
 	
 		struct passwd *uID = getpwuid(statBuff.st_uid);
+		if(uID == NULL) perror("getpwuid()");
 		struct group *gID = getgrgid(statBuff.st_gid);
+		if(gID == NULL) perror("getgrid()");
 
 		if(uID){
-			cout << " " << getpwuid(statBuff.st_uid)->pw_name;
+			cout << " " << uID->pw_name;
 		}else{
 			cout << " ?";
 			//perror("getpwuid");
 		}
 	
 		if(gID){		
-			cout << " " << getgrgid(statBuff.st_gid)->gr_name;
+			cout << " " << gID->gr_name;
 		}else{
 			cout << " ?";
 			//perror("getgrgid");

@@ -76,6 +76,9 @@ void cpRDWR(string in, string out, int buffSize){
 			exit(1);
 		}
 		readVal = read(infd, buff, buffSize);
+		if(readVal == -1){
+			perror("read()");
+		}
 	}
 
 	if(close(infd) == -1){
