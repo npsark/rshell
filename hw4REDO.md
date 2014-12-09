@@ -1,5 +1,5 @@
 #Output Formatting in C++
-Almost anyone who has spent more than a few minutes using C++ has heard of, if not used cout, cin, and cerr.However, many C++ programmers are unaware of some of the obscure tricks and techniques that are available in the *iostream* library. In this tutorial we are going to explore some of those forgotten bits and come out with a few new tools that we can use to format text in more interesting ways.
+Almost anyone who has spent more than a few minutes using C++ has heard of, if not used cout, cin, and cerr. However, many C++ programmers are unaware of some of the obscure tricks and techniques that are available in the *iostream* library. In this tutorial we are going to explore some of those forgotten bits as well as some other formatting features and come out with a few new tools that we can use to format text in more interesting ways.
 
 ##iomanip
 *iomanip* is a library dedicated to somewhat miscellaneous input and output manipulations. Some of these are incredibly usefull, while othere seem pretty random. Let's get into some of them.
