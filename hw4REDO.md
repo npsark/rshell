@@ -69,3 +69,21 @@ Pretty straight forward again, just pick a character and that's what `setw()` wi
 *iomanip* has a few more interesting functions that I'm just going to skip for now. Feel free to look them up in the C++ documentation for [*iomanip*](http://www.cplusplus.com/reference/iomanip/).
 
 ##ANSI
+Now I'm going to get into using ANSI codes to further format our output. After this, you will be able to set the foreground and background colors of, underline, and bold your output.
+
+###Colors
+Using ANSI codes in C++ is pretty funky so let's start with an example.
+```
+cout << "\033[41;33mHello World!" << endl";
+```
+Inserting an ANSI code to change text color start with inserting `\033[` before the text you want to ouput. So for the example above, it was inserted between the opening quotation mark and the 'H' of "Hello World!". This signifies the beginning of the ANSI code. Next come some numbers separated by semicolons. The numbers are what determine which format feature you want to use. For example, anything between 30 and 37 sets the foreground color. Anything between 40 and 47 sets the foreground color. To see exactly which colors each number corresponds to, check out this [table](http://ascii-table.com/ansi-escape-sequences.php). The last bit you need to add to complete the ANSI code is the character 'm'. This signifies the end of the code.
+
+The output of the code above will be the text, "Hello World!" highlighted in red and printed in yellow. Checking the ANSI table I mentioned, we can see that 41 corresponds to red highlighting and 33 corresponds to yellow text.
+
+###Misc Formatting
+Some other attributes you can set with ANSI codes include underlining and bolding. These are just as simple to set as the colors are. The number 4 corresponds to underlining and 1 corresponds to bolding. So, to add these to colored and highlighted text, we simply add 1 and 4 to the list of numbers in the ANSI code. Here's what that will look like:
+```
+cout << "\033[41;33;1;4mHello World!" << endl";
+```
+
+So thats a smalle taste of what you can do with ANSI. If you followed this tutorial and cannot get the ANSI formatting to work, it is possible you are using a console that does not support those features. I am using the default terminal that comes with Debian and everything works fine. The console that comes with Code::Blocks on Windows however, does not support ANSI. A common symptom of a console that does not support ANSI is junk characters being printed.
