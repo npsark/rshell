@@ -6,6 +6,7 @@ Almost anyone who has spent more than a few minutes using C++ has heard of, if n
 
 ###setbase()
 `setbase()` is a function that allows the user to pick what number system is used to ouput integers. Specifically, it can be set to decimal, octal, or hexadecimal. Here's an example.
+
 code:
 ```
 cout << setbase(16) << 26 << endl;
@@ -22,6 +23,7 @@ The above code will output the number 26 three times. Once in hexadecimal, once 
 
 ###setw()
 `setw()` is a really usefull fuction when dealing with columns of output. In terms of a spreadsheet, `setw()` essentially sets the width of a cell. Here's an example.
+
 code:
 ```
 cout << setw(10) << "apple";
@@ -39,6 +41,7 @@ output:
 The above code prints out a table of six elements into two rows and three columns. Each element can be up to 10 characters long. If any element is longer than 10 characters, it will push the next elements on the same row over. `setw()` does not permenently set the new width. It is only set for the next bit of text being printed. That is why it is called before every line of output in the given code.
 
 There are a couple more things you can do with `setw()`. First of all, you can set the justification. This is also wonderfully simple. Here's how you would left justify the last example:
+
 code:
 ```
 cout << left;
@@ -56,7 +59,8 @@ plum      pumpkin   grape
 ```
 All I had to do was add `cout << left;` before the text I wanted to justify. Unlike, `setw()` the justfication only has to be set once and all of the following output will adhere to it until, it is set to something else. The three justification options are `left`, `right`, and `internal`. The first two are pretty obvious. `internal`, on the other hand is pretty strange. What it does is left justify the signs of numbers and right justify the magnitude of number. For example, `cout setw(5) << internal << -57` could output `-  57`. According to the documentation, this is aparently usefull for accounting documents. So here's to you, accountants out there!
 
-The last thing I want to discuss regarding `setw()` is `setfill()`. `setfill()` allows you to set what character is used in the empty spaces that often appear when using `setw()`. Example:
+The last thing I want to discuss regarding `setw()` is `setfill()`. `setfill()` allows you to set what character is used in the empty spaces that often appear when using `setw()`.
+
 code:
 ```
 cout << left << setfill('.');
