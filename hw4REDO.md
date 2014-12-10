@@ -2,7 +2,7 @@
 Almost anyone who has spent more than a few minutes using C++ has heard of, if not used cout, cin, and cerr. However, many C++ programmers are unaware of some of the obscure tricks and techniques that are available in the *iostream* library. In this tutorial we are going to explore some of those forgotten bits as well as some other formatting features and come out with a few new tools that we can use to format text in more interesting ways.
 
 ##iomanip
-*iomanip* is a library dedicated to somewhat miscellaneous input and output manipulations. Some of these are incredibly usefull, while othere seem pretty random. Let's get into some of them.
+*iomanip* is a library dedicated to miscellaneous input and output manipulations. Let's get into some of them.
 
 ###setbase()
 `setbase()` is a function that allows the user to pick what number system is used to ouput integers. Specifically, it can be set to decimal, octal, or hexadecimal. Here's an example.
@@ -19,7 +19,7 @@ output:
 26
 32
 ```
-The above code will output the number 26 three times. Once in hexadecimal, once in decimal, and once in octal. This is a really simple function that might not be screaming usefullness, but does come in handy every now and then.
+The above code will output the number 26 three times. Once in hexadecimal, once in decimal, and once in octal. This is a really simple function that might not be screaming usefullness, but does come in handy every now and then. For example, when dealing with bitwise shifting, it can be helpful to display the integer that is being shifted in octal or hexadecimal. Another common use is file permission manipulation. File permisions are represented by integers but they are much more readable in octal rather than decimal.
 
 ###setw()
 `setw()` is a really usefull fuction when dealing with columns of output. In terms of a spreadsheet, `setw()` essentially sets the width of a cell. Here's an example.
@@ -86,6 +86,7 @@ Now I'm going to get into using ANSI codes to further format our output. After t
 ###Colors
 Using ANSI codes in C++ is pretty funky so let's start with an example.
 ```
+
 cout << "\033[41;33mHello World!" << endl";
 ```
 Inserting an ANSI code to change text color start with inserting `\033[` before the text you want to ouput. So for the example above, it was inserted between the opening quotation mark and the 'H' of "Hello World!". This signifies the beginning of the ANSI code. Next come some numbers separated by semicolons. The numbers are what determine which format feature you want to use. For example, anything between 30 and 37 sets the foreground color. Anything between 40 and 47 sets the foreground color. To see exactly which colors each number corresponds to, check out this [table](http://ascii-table.com/ansi-escape-sequences.php). The last bit you need to add to complete the ANSI code is the character 'm'. This signifies the end of the code.
