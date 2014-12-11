@@ -94,7 +94,7 @@ The important part is `\033[41;33m`. This is how ANSI codes are formatted. First
 
 Font color can be set using codes 30 - 37. Highlighting can be set using codes 40 - 47. Other formatting options, such as underlining, bolding, etc. each have a corresponding number that can be added to the list. For a full list, check out this [table](http://ascii-table.com/ansi-escape-sequences.php).
 
-A cleaner way to incorporate ANSI codes is to store each code in a separate string. Like this:
+A cleaner way to incorporate ANSI codes is to store each code in a separate strings. Like this:
 ```
 string black = "\033[30m";
 string red = "\033[31m";
@@ -137,5 +137,6 @@ string bold = "\033[1m";
 
 cout << underline << bold << red << yellowHL << "Hello World!" << endl";
 ```
+This will print "Hello World!" in red, withc yellow highlighting, underlined, and bolded.
 
 So thats a small taste of what you can do with ANSI. If you followed this tutorial and cannot get the ANSI formatting to work, it is possible you are using a console that does not support those features. I am using the default terminal that comes with Debian and everything works fine. The console that comes with Code::Blocks on Windows however, does not support ANSI. A common symptom of a console that does not support ANSI is junk characters being printed.
